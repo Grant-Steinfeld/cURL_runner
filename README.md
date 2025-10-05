@@ -162,14 +162,24 @@ cURL_runner/
 ├── index.js          # Main application (ES modules)
 ├── package.json      # Node.js dependencies and scripts
 ├── README.md         # This file
+├── docs/             # Documentation directory
+│   ├── README.md     # Documentation index
+│   ├── SEPARATION_OF_CONCERNS.md
+│   ├── TEST_MOCKING_UPDATE.md
+│   └── HowJestNeededToBeConfiguredForESModules.md
+├── src/              # Source code (separation of concerns)
+│   ├── cli/          # CLI handling
+│   ├── config/       # Configuration
+│   ├── lib/          # Core business logic
+│   └── utils/        # Utility classes
 ├── scripts/          # Directory for .sh files
 │   ├── example-get.sh
 │   ├── example-post.sh
 │   └── example-headers.sh
 ├── tests/            # Testing framework
-│   ├── __tests__/    # Test files
-│   │   ├── CurlRunner.node.test.js
-│   │   └── [other test files]
+│   ├── unit/         # Unit tests
+│   ├── integration/  # Integration tests
+│   ├── e2e/          # End-to-end tests
 │   └── fixtures/     # Test script files
 └── var/
     └── logs/         # Execution logs directory
@@ -214,6 +224,15 @@ The application will:
 - Continue executing remaining scripts even if one fails
 - Provide a summary of successful vs failed executions
 - Display execution timing for each script
+
+## Documentation
+
+Additional documentation is available in the [`docs/`](docs/) directory:
+
+- **[Architecture & Design](docs/)** - Detailed documentation about the project structure and design decisions
+- **[Separation of Concerns](docs/SEPARATION_OF_CONCERNS.md)** - Modular architecture implementation
+- **[Test Mocking Update](docs/TEST_MOCKING_UPDATE.md)** - Testing strategies and utility class testing
+- **[Jest Migration History](docs/HowJestNeededToBeConfiguredForESModules.md)** - Historical context of the Jest to Node.js test runner migration
 
 ## License
 
