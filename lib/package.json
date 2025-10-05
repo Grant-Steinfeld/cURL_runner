@@ -1,0 +1,59 @@
+{
+  "name": "@curl-runner/core",
+  "version": "1.0.0",
+  "description": "Core library for running cURL scripts with comprehensive logging and error handling",
+  "type": "module",
+  "main": "dist/index.js",
+  "module": "dist/index.esm.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "rollup -c",
+    "dev": "rollup -c -w",
+    "test": "node --test tests/**/*.test.js",
+    "test:coverage": "c8 node --test tests/**/*.test.js",
+    "prepublishOnly": "npm run build && npm test"
+  },
+  "keywords": [
+    "curl",
+    "http",
+    "api",
+    "testing",
+    "scripts",
+    "automation",
+    "logging",
+    "error-handling"
+  ],
+  "author": "Grant Steinfeld",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "chalk": "^5.3.0"
+  },
+  "devDependencies": {
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-terser": "^0.4.4",
+    "c8": "^8.0.1",
+    "rollup": "^4.9.1",
+    "rollup-plugin-dts": "^6.1.0",
+    "typescript": "^5.3.3"
+  },
+  "peerDependencies": {
+    "node": ">=18.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Grant-Steinfeld/cURL_runner.git",
+    "directory": "lib"
+  },
+  "bugs": {
+    "url": "https://github.com/Grant-Steinfeld/cURL_runner/issues"
+  },
+  "homepage": "https://github.com/Grant-Steinfeld/cURL_runner#readme"
+}
