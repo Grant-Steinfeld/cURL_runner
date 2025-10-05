@@ -15,6 +15,9 @@ This directory contains all documentation for the cURL Runner project, organized
 - **[Node.js Version Requirements](NODE_VERSION_REQUIREMENTS.md)** - Detailed analysis of Node.js version compatibility and feature requirements
 - **[Node.js Compatibility Analysis](NODE_COMPATIBILITY_ANALYSIS.md)** - Visual analysis with Mermaid diagrams of version compatibility and migration paths
 
+### **Testing & Quality**
+- **[Test Status Summary](TEST_STATUS_SUMMARY.md)** - Comprehensive analysis of current test results and coverage
+
 ## 🏗️ Project Structure
 
 ```
@@ -23,6 +26,9 @@ cURL_runner/
 │   ├── README.md          # This index file
 │   ├── SEPARATION_OF_CONCERNS.md
 │   ├── TEST_MOCKING_UPDATE.md
+│   ├── NODE_VERSION_REQUIREMENTS.md
+│   ├── NODE_COMPATIBILITY_ANALYSIS.md
+│   ├── TEST_STATUS_SUMMARY.md
 │   └── HowJestNeededToBeConfiguredForESModules.md
 ├── src/                   # Source code
 │   ├── cli/              # CLI handling
