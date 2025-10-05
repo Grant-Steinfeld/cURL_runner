@@ -20,6 +20,30 @@ A Node.js application that can execute cURL scripts from standalone `.sh` files 
 npm install
 ```
 
+## Testing
+
+The project uses Node.js built-in test runner with native ES modules support:
+
+```bash
+# Run all tests
+npm test
+
+# Run tests in watch mode
+npm run test:watch
+
+# Run tests with coverage
+npm run test:coverage
+
+# Run tests for CI
+npm run test:ci
+```
+
+### Test Structure
+- `tests/__tests__/` - All test files
+- `tests/fixtures/` - Test script files
+- Uses Node.js built-in test runner (no Jest configuration needed)
+- Native ES modules support
+
 ## Usage
 
 ### Run All Scripts
@@ -135,13 +159,18 @@ tail -f var/logs/curl-runner-report.log | while read line; do echo "$(date '+%H:
 
 ```
 cURL_runner/
-├── index.js          # Main application
-├── package.json      # Node.js dependencies
+├── index.js          # Main application (ES modules)
+├── package.json      # Node.js dependencies and scripts
 ├── README.md         # This file
 ├── scripts/          # Directory for .sh files
 │   ├── example-get.sh
 │   ├── example-post.sh
 │   └── example-headers.sh
+├── tests/            # Testing framework
+│   ├── __tests__/    # Test files
+│   │   ├── CurlRunner.node.test.js
+│   │   └── [other test files]
+│   └── fixtures/     # Test script files
 └── var/
     └── logs/         # Execution logs directory
         ├── curl-runner-report.log    # High-level report log (tail-friendly)
@@ -152,9 +181,31 @@ cURL_runner/
 
 ## Requirements
 
-- Node.js 14.0.0 or higher
+- Node.js 18.0.0 or higher (for built-in test runner)
 - Bash shell (for executing .sh files)
 - curl command available in PATH
+
+## Development
+
+### Testing Framework
+- **Node.js Built-in Test Runner** - Native ES modules support
+- **No Jest configuration needed** - Works out of the box with ES modules
+- **Coverage support** - Using c8 for code coverage
+- **Watch mode** - Automatic test re-running during development
+
+### ES Modules
+- **Modern JavaScript** - Uses `import`/`export` syntax
+- **No transformation needed** - Node.js native support
+- **Type: module** - Configured in package.json
+
+### Testing Approach
+This project demonstrates effective problem-solving by **breaking patterns** when stuck:
+
+1. **Initial Challenge**: Jest doesn't work well with ES modules out of the box
+2. **Pattern Breaking**: Instead of fighting Jest configuration, switched to Node.js built-in test runner
+3. **Result**: Native ES modules support with zero configuration needed
+
+**Key Learning**: When stuck in a loop, completely change the approach rather than trying to fix the same method repeatedly.
 
 ## Error Handling
 

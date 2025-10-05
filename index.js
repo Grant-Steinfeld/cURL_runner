@@ -8,7 +8,7 @@ import { Command } from 'commander';
 
 const program = new Command();
 
-class CurlRunner {
+export class CurlRunner {
   constructor(scriptsDir = './scripts', logsDir = './var/logs') {
     this.scriptsDir = scriptsDir;
     this.logsDir = logsDir;
