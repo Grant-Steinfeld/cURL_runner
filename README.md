@@ -191,9 +191,11 @@ cURL_runner/
 
 ## Requirements
 
-- Node.js 18.0.0 or higher (for built-in test runner)
-- Bash shell (for executing .sh files)
-- curl command available in PATH
+- **Node.js 18.0.0 or higher** (required for built-in test runner and ES modules)
+- **Bash shell** (for executing .sh files)
+- **curl command** available in PATH
+
+> **Note**: Node.js 18.0.0+ is required because this project uses the built-in test runner (`node:test`) and built-in assert module (`node:assert`) which were introduced in Node.js 18.0.0. See [Node.js Version Requirements](docs/NODE_VERSION_REQUIREMENTS.md) for detailed information.
 
 ## Development
 

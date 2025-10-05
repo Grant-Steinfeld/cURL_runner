@@ -11,6 +11,9 @@ This directory contains all documentation for the cURL Runner project, organized
 ### **Development History**
 - **[Jest Configuration for ES Modules](HowJestNeededToBeConfiguredForESModules.md)** - Historical documentation of the Jest to Node.js test runner migration and ES modules challenges
 
+### **System Requirements**
+- **[Node.js Version Requirements](NODE_VERSION_REQUIREMENTS.md)** - Detailed analysis of Node.js version compatibility and feature requirements
+
 ## 🏗️ Project Structure
 
 ```
