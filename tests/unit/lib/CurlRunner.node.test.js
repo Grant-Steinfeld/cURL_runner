@@ -27,7 +27,7 @@ Object.defineProperty(process, 'fs', {
 });
 
 // Import our class after mocking
-const { CurlRunner } = await import('../../index.js');
+const { CurlRunner } = await import('../../../src/lib/CurlRunner.js');
 
 describe('CurlRunner', () => {
   let curlRunner;
@@ -56,8 +56,9 @@ describe('CurlRunner', () => {
       const defaultRunner = new CurlRunner();
       assert.strictEqual(defaultRunner.scriptsDir, './scripts');
       assert.strictEqual(defaultRunner.logsDir, './var/logs');
-      assert.strictEqual(defaultRunner.reportLogFile, 'curl-runner-report.log');
-      assert.strictEqual(defaultRunner.errorLogFile, 'curl-api-errors.log');
+      assert.ok(defaultRunner.logger);
+      assert.strictEqual(defaultRunner.logger.reportLogFile, 'curl-runner-report.log');
+      assert.strictEqual(defaultRunner.logger.errorLogFile, 'curl-api-errors.log');
     });
 
     it('should initialize with custom directories', () => {

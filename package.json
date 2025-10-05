@@ -7,10 +7,13 @@
   "scripts": {
     "start": "node index.js",
     "dev": "node index.js",
-    "test": "node --test tests/__tests__/*.test.js",
-    "test:watch": "node --test --watch tests/__tests__/*.test.js",
-    "test:coverage": "c8 node --test tests/__tests__/*.test.js",
-    "test:ci": "node --test tests/__tests__/*.test.js"
+    "test": "node --test tests/**/*.test.js",
+    "test:unit": "node --test tests/unit/**/*.test.js",
+    "test:integration": "node --test tests/integration/**/*.test.js",
+    "test:e2e": "node --test tests/e2e/**/*.test.js",
+    "test:watch": "node --test --watch tests/**/*.test.js",
+    "test:coverage": "c8 node --test tests/**/*.test.js",
+    "test:ci": "node --test tests/**/*.test.js"
   },
   "keywords": [
     "curl",
@@ -32,6 +35,6 @@
     "supertest": "^6.3.3"
   },
   "engines": {
-    "node": ">=14.0.0"
+    "node": ">=18.0.0"
   }
 }

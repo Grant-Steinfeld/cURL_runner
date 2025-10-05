@@ -3,7 +3,7 @@ import assert from 'node:assert';
 import fs from 'fs';
 import path from 'path';
 import { exec } from 'child_process';
-import { CurlRunner } from '../../index.js';
+import { CurlRunner } from '../../../src/lib/CurlRunner.js';
 
 // Mock child_process
 const mockExec = mock.fn();
@@ -54,8 +54,9 @@ describe('CurlRunner', () => {
       const defaultRunner = new CurlRunner();
       assert.strictEqual(defaultRunner.scriptsDir, './scripts');
       assert.strictEqual(defaultRunner.logsDir, './var/logs');
-      assert.strictEqual(defaultRunner.reportLogFile, 'curl-runner-report.log');
-      assert.strictEqual(defaultRunner.errorLogFile, 'curl-api-errors.log');
+      assert.ok(defaultRunner.logger);
+      assert.strictEqual(defaultRunner.logger.reportLogFile, 'curl-runner-report.log');
+      assert.strictEqual(defaultRunner.logger.errorLogFile, 'curl-api-errors.log');
     });
 
     it('should initialize with custom directories', () => {
