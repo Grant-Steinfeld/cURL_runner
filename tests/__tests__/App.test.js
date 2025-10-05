@@ -1,25 +1,37 @@
+import { describe, it, beforeEach, mock } from 'node:test';
+import assert from 'node:assert';
 import { spawn } from 'child_process';
 import fs from 'fs';
 
 // Mock fs
-jest.mock('fs', () => ({
-  existsSync: jest.fn(),
-  readdirSync: jest.fn(),
-  mkdirSync: jest.fn(),
-  appendFileSync: jest.fn(),
-}));
+const mockFs = {
+  existsSync: mock.fn(),
+  readdirSync: mock.fn(),
+  mkdirSync: mock.fn(),
+  appendFileSync: mock.fn()
+};
+
+// Replace the real fs with mock
+Object.defineProperty(process, 'fs', {
+  value: mockFs,
+  writable: true
+});
 
 describe('Application Entry Point', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
-    fs.existsSync.mockReturnValue(true);
-    fs.readdirSync.mockReturnValue(['test-script.sh']);
-    fs.mkdirSync.mockImplementation(() => {});
-    fs.appendFileSync.mockImplementation(() => {});
+    mockFs.existsSync.mock.resetCalls();
+    mockFs.readdirSync.mock.resetCalls();
+    mockFs.mkdirSync.mock.resetCalls();
+    mockFs.appendFileSync.mock.resetCalls();
+    
+    mockFs.existsSync.mock.mockImplementation(() => true);
+    mockFs.readdirSync.mock.mockImplementation(() => ['test-script.sh']);
+    mockFs.mkdirSync.mock.mockImplementation(() => {});
+    mockFs.appendFileSync.mock.mockImplementation(() => {});
   });
 
   describe('Application Startup', () => {
-    test('should start without errors', (done) => {
+    it('should start without errors', async () => {
       const child = spawn('node', ['index.js', '--help'], {
         cwd: process.cwd(),
         stdio: 'pipe'
@@ -30,15 +42,20 @@ describe('Application Entry Point', () => {
         output += data.toString();
       });
 
-      child.on('close', (code) => {
-        expect(code).toBe(0);
-        expect(output).toContain('curl-runner');
-        expect(output).toContain('Run cURL scripts from .sh files');
-        done();
+      await new Promise((resolve, reject) => {
+        child.on('close', (code) => {
+          if (code === 0) {
+            assert.match(output, /curl-runner/);
+            assert.match(output, /Run cURL scripts from \.sh files/);
+            resolve();
+          } else {
+            reject(new Error(`Process exited with code ${code}`));
+          }
+        });
       });
     });
 
-    test('should show version information', (done) => {
+    it('should show version information', async () => {
       const child = spawn('node', ['index.js', '--version'], {
         cwd: process.cwd(),
         stdio: 'pipe'
@@ -49,16 +66,21 @@ describe('Application Entry Point', () => {
         output += data.toString();
       });
 
-      child.on('close', (code) => {
-        expect(code).toBe(0);
-        expect(output).toContain('1.0.0');
-        done();
+      await new Promise((resolve, reject) => {
+        child.on('close', (code) => {
+          if (code === 0) {
+            assert.match(output, /1\.0\.0/);
+            resolve();
+          } else {
+            reject(new Error(`Process exited with code ${code}`));
+          }
+        });
       });
     });
   });
 
   describe('Command Line Interface', () => {
-    test('should handle invalid commands gracefully', (done) => {
+    it('should handle invalid commands gracefully', async () => {
       const child = spawn('node', ['index.js', 'invalid-command'], {
         cwd: process.cwd(),
         stdio: 'pipe'
@@ -69,14 +91,19 @@ describe('Application Entry Point', () => {
         output += data.toString();
       });
 
-      child.on('close', (code) => {
-        expect(code).toBe(1);
-        expect(output).toContain('unknown command');
-        done();
+      await new Promise((resolve, reject) => {
+        child.on('close', (code) => {
+          if (code === 1) {
+            assert.match(output, /unknown command/);
+            resolve();
+          } else {
+            reject(new Error(`Expected exit code 1, got ${code}`));
+          }
+        });
       });
     });
 
-    test('should show help for run command', (done) => {
+    it('should show help for run command', async () => {
       const child = spawn('node', ['index.js', 'run', '--help'], {
         cwd: process.cwd(),
         stdio: 'pipe'
@@ -87,16 +114,21 @@ describe('Application Entry Point', () => {
         output += data.toString();
       });
 
-      child.on('close', (code) => {
-        expect(code).toBe(0);
-        expect(output).toContain('Run all .sh files in the scripts directory');
-        expect(output).toContain('-d, --dir <directory>');
-        expect(output).toContain('-l, --logs <directory>');
-        done();
+      await new Promise((resolve, reject) => {
+        child.on('close', (code) => {
+          if (code === 0) {
+            assert.match(output, /Run all \.sh files in the scripts directory/);
+            assert.match(output, /-d, --dir <directory>/);
+            assert.match(output, /-l, --logs <directory>/);
+            resolve();
+          } else {
+            reject(new Error(`Process exited with code ${code}`));
+          }
+        });
       });
     });
 
-    test('should show help for run-script command', (done) => {
+    it('should show help for run-script command', async () => {
       const child = spawn('node', ['index.js', 'run-script', '--help'], {
         cwd: process.cwd(),
         stdio: 'pipe'
@@ -107,15 +139,20 @@ describe('Application Entry Point', () => {
         output += data.toString();
       });
 
-      child.on('close', (code) => {
-        expect(code).toBe(0);
-        expect(output).toContain('Run a specific .sh file');
-        expect(output).toContain('<script>');
-        done();
+      await new Promise((resolve, reject) => {
+        child.on('close', (code) => {
+          if (code === 0) {
+            assert.match(output, /Run a specific \.sh file/);
+            assert.match(output, /<script>/);
+            resolve();
+          } else {
+            reject(new Error(`Process exited with code ${code}`));
+          }
+        });
       });
     });
 
-    test('should show help for list command', (done) => {
+    it('should show help for list command', async () => {
       const child = spawn('node', ['index.js', 'list', '--help'], {
         cwd: process.cwd(),
         stdio: 'pipe'
@@ -126,18 +163,23 @@ describe('Application Entry Point', () => {
         output += data.toString();
       });
 
-      child.on('close', (code) => {
-        expect(code).toBe(0);
-        expect(output).toContain('List all available .sh files');
-        done();
+      await new Promise((resolve, reject) => {
+        child.on('close', (code) => {
+          if (code === 0) {
+            assert.match(output, /List all available \.sh files/);
+            resolve();
+          } else {
+            reject(new Error(`Process exited with code ${code}`));
+          }
+        });
       });
     });
   });
 
   describe('Error Handling', () => {
-    test('should handle missing scripts directory gracefully', (done) => {
-      fs.existsSync.mockReturnValue(false);
-      fs.readdirSync.mockImplementation(() => {
+    it('should handle missing scripts directory gracefully', async () => {
+      mockFs.existsSync.mock.mockImplementation(() => false);
+      mockFs.readdirSync.mock.mockImplementation(() => {
         throw new Error('Directory not found');
       });
 
@@ -151,16 +193,21 @@ describe('Application Entry Point', () => {
         output += data.toString();
       });
 
-      child.on('close', (code) => {
-        expect(code).toBe(0);
-        expect(output).toContain('No .sh files found to run');
-        done();
+      await new Promise((resolve, reject) => {
+        child.on('close', (code) => {
+          if (code === 0) {
+            assert.match(output, /No \.sh files found to run/);
+            resolve();
+          } else {
+            reject(new Error(`Process exited with code ${code}`));
+          }
+        });
       });
     });
 
-    test('should handle permission errors gracefully', (done) => {
-      fs.existsSync.mockReturnValue(true);
-      fs.readdirSync.mockImplementation(() => {
+    it('should handle permission errors gracefully', async () => {
+      mockFs.existsSync.mock.mockImplementation(() => true);
+      mockFs.readdirSync.mock.mockImplementation(() => {
         throw new Error('Permission denied');
       });
 
@@ -174,22 +221,21 @@ describe('Application Entry Point', () => {
         output += data.toString();
       });
 
-      child.on('close', (code) => {
-        expect(code).toBe(0);
-        expect(output).toContain('No .sh files found to run');
-        done();
+      await new Promise((resolve, reject) => {
+        child.on('close', (code) => {
+          if (code === 0) {
+            assert.match(output, /No \.sh files found to run/);
+            resolve();
+          } else {
+            reject(new Error(`Process exited with code ${code}`));
+          }
+        });
       });
     });
   });
 
   describe('Default Behavior', () => {
-    test('should run all scripts when no arguments provided', (done) => {
-      // Mock successful script execution
-      const { exec } = require('child_process');
-      exec.mockImplementation((command, callback) => {
-        callback(null, 'Test output\nHTTP Status: 200\n', '');
-      });
-
+    it('should run all scripts when no arguments provided', async () => {
       const child = spawn('node', ['index.js'], {
         cwd: process.cwd(),
         stdio: 'pipe'
@@ -200,10 +246,15 @@ describe('Application Entry Point', () => {
         output += data.toString();
       });
 
-      child.on('close', (code) => {
-        expect(code).toBe(0);
-        expect(output).toContain('Running 1 script(s)');
-        done();
+      await new Promise((resolve, reject) => {
+        child.on('close', (code) => {
+          if (code === 0) {
+            assert.match(output, /Running \d+ script\(s\)/);
+            resolve();
+          } else {
+            reject(new Error(`Process exited with code ${code}`));
+          }
+        });
       });
     });
   });

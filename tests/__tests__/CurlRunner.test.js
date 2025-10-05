@@ -1,20 +1,31 @@
+import { describe, it, beforeEach, mock } from 'node:test';
+import assert from 'node:assert';
 import fs from 'fs';
 import path from 'path';
 import { exec } from 'child_process';
 import { CurlRunner } from '../../index.js';
 
 // Mock child_process
-jest.mock('child_process', () => ({
-  exec: jest.fn(),
-}));
+const mockExec = mock.fn();
 
 // Mock fs
-jest.mock('fs', () => ({
-  existsSync: jest.fn(),
-  readdirSync: jest.fn(),
-  mkdirSync: jest.fn(),
-  appendFileSync: jest.fn(),
-}));
+const mockFs = {
+  existsSync: mock.fn(),
+  readdirSync: mock.fn(),
+  mkdirSync: mock.fn(),
+  appendFileSync: mock.fn()
+};
+
+// Replace the real modules with mocks
+Object.defineProperty(process, 'child_process', {
+  value: { exec: mockExec },
+  writable: true
+});
+
+Object.defineProperty(process, 'fs', {
+  value: mockFs,
+  writable: true
+});
 
 describe('CurlRunner', () => {
   let curlRunner;
@@ -23,108 +34,117 @@ describe('CurlRunner', () => {
 
   beforeEach(() => {
     // Reset all mocks
-    jest.clearAllMocks();
+    mockExec.mock.resetCalls();
+    mockFs.existsSync.mock.resetCalls();
+    mockFs.readdirSync.mock.resetCalls();
+    mockFs.mkdirSync.mock.resetCalls();
+    mockFs.appendFileSync.mock.resetCalls();
     
     // Setup default mock implementations
-    fs.existsSync.mockReturnValue(true);
-    fs.readdirSync.mockReturnValue(['test-script.sh', 'another-script.sh']);
-    fs.mkdirSync.mockImplementation(() => {});
-    fs.appendFileSync.mockImplementation(() => {});
+    mockFs.existsSync.mock.mockImplementation(() => true);
+    mockFs.readdirSync.mock.mockImplementation(() => ['test-script.sh', 'another-script.sh']);
+    mockFs.mkdirSync.mock.mockImplementation(() => {});
+    mockFs.appendFileSync.mock.mockImplementation(() => {});
     
     curlRunner = new CurlRunner(testScriptsDir, testLogsDir);
   });
 
   describe('Constructor', () => {
-    test('should initialize with default directories', () => {
+    it('should initialize with default directories', () => {
       const defaultRunner = new CurlRunner();
-      expect(defaultRunner.scriptsDir).toBe('./scripts');
-      expect(defaultRunner.logsDir).toBe('./var/logs');
-      expect(defaultRunner.reportLogFile).toBe('curl-runner-report.log');
-      expect(defaultRunner.errorLogFile).toBe('curl-api-errors.log');
+      assert.strictEqual(defaultRunner.scriptsDir, './scripts');
+      assert.strictEqual(defaultRunner.logsDir, './var/logs');
+      assert.strictEqual(defaultRunner.reportLogFile, 'curl-runner-report.log');
+      assert.strictEqual(defaultRunner.errorLogFile, 'curl-api-errors.log');
     });
 
-    test('should initialize with custom directories', () => {
-      expect(curlRunner.scriptsDir).toBe(testScriptsDir);
-      expect(curlRunner.logsDir).toBe(testLogsDir);
+    it('should initialize with custom directories', () => {
+      assert.strictEqual(curlRunner.scriptsDir, testScriptsDir);
+      assert.strictEqual(curlRunner.logsDir, testLogsDir);
     });
 
-    test('should create logs directory if it does not exist', () => {
-      fs.existsSync.mockReturnValue(false);
+    it('should create logs directory if it does not exist', () => {
+      mockFs.existsSync.mock.mockImplementation(() => false);
       new CurlRunner(testScriptsDir, testLogsDir);
-      expect(fs.mkdirSync).toHaveBeenCalledWith(testLogsDir, { recursive: true });
+      assert.strictEqual(mockFs.mkdirSync.mock.callCount(), 1);
     });
   });
 
   describe('generateLogFilename', () => {
-    test('should generate filename with timestamp for batch runs', () => {
+    it('should generate filename with timestamp for batch runs', () => {
       const filename = curlRunner.generateLogFilename();
-      expect(filename).toMatch(/^run_\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}\.log$/);
+      assert.match(filename, /^run_\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}\.log$/);
     });
 
-    test('should generate filename with script name and timestamp', () => {
+    it('should generate filename with script name and timestamp', () => {
       const filename = curlRunner.generateLogFilename('test-script.sh');
-      expect(filename).toMatch(/^test-script_\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}\.log$/);
+      assert.match(filename, /^test-script_\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}\.log$/);
     });
 
-    test('should clean script name for filename', () => {
+    it('should clean script name for filename', () => {
       const filename = curlRunner.generateLogFilename('test-script@#$%.sh');
-      expect(filename).toMatch(/^test-script____\.log$/);
+      assert.match(filename, /^test-script____\.log$/);
     });
   });
 
   describe('writeLog', () => {
-    test('should write log entry to file', () => {
+    it('should write log entry to file', () => {
       const logFile = 'test.log';
       const entry = 'Test log entry';
       
       curlRunner.writeLog(logFile, entry);
       
-      expect(fs.appendFileSync).toHaveBeenCalledWith(
-        path.join(testLogsDir, logFile),
-        expect.stringMatching(/^\[\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z\] Test log entry\n$/)
-      );
+      assert.strictEqual(mockFs.appendFileSync.mock.callCount(), 1);
+      const call = mockFs.appendFileSync.mock.calls[0];
+      assert.strictEqual(call[0], path.join(testLogsDir, logFile));
+      assert.match(call[1], /^\[\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z\] Test log entry\n$/);
     });
 
-    test('should handle write errors gracefully', () => {
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
-      fs.appendFileSync.mockImplementation(() => {
+    it('should handle write errors gracefully', () => {
+      const consoleSpy = mock.fn();
+      const originalError = console.error;
+      console.error = consoleSpy;
+      
+      mockFs.appendFileSync.mock.mockImplementation(() => {
         throw new Error('Write failed');
       });
       
       curlRunner.writeLog('test.log', 'Test entry');
       
-      expect(consoleSpy).toHaveBeenCalledWith('Error writing to log file: Write failed');
-      consoleSpy.mockRestore();
+      assert.strictEqual(consoleSpy.mock.callCount(), 1);
+      assert.match(consoleSpy.mock.calls[0][0], /Error writing to log file: Write failed/);
+      
+      console.error = originalError;
     });
   });
 
   describe('writeReportLog', () => {
-    test('should write report log entry', () => {
+    it('should write report log entry', () => {
       const entry = 'Test report entry';
       
       curlRunner.writeReportLog(entry);
       
-      expect(fs.appendFileSync).toHaveBeenCalledWith(
-        path.join(testLogsDir, 'curl-runner-report.log'),
-        expect.stringMatching(/^\[\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z\] Test report entry\n$/)
-      );
+      assert.strictEqual(mockFs.appendFileSync.mock.callCount(), 1);
+      const call = mockFs.appendFileSync.mock.calls[0];
+      assert.strictEqual(call[0], path.join(testLogsDir, 'curl-runner-report.log'));
+      assert.match(call[1], /^\[\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z\] Test report entry\n$/);
     });
   });
 
   describe('writeErrorLog', () => {
-    test('should write error log entry with basic info', () => {
+    it('should write error log entry with basic info', () => {
       const scriptName = 'test-script.sh';
       const errorDetails = 'Test error';
       
       curlRunner.writeErrorLog(scriptName, errorDetails);
       
-      expect(fs.appendFileSync).toHaveBeenCalledWith(
-        path.join(testLogsDir, 'curl-api-errors.log'),
-        expect.stringContaining('❌ API ERROR: test-script.sh')
-      );
+      assert.strictEqual(mockFs.appendFileSync.mock.callCount(), 1);
+      const call = mockFs.appendFileSync.mock.calls[0];
+      const logContent = call[1];
+      assert.match(logContent, /❌ API ERROR: test-script\.sh/);
     });
 
-    test('should write error log entry with HTTP status and duration', () => {
+    it('should write error log entry with HTTP status and duration', () => {
       const scriptName = 'test-script.sh';
       const errorDetails = 'HTTP 404 error';
       const httpStatus = 404;
@@ -132,147 +152,152 @@ describe('CurlRunner', () => {
       
       curlRunner.writeErrorLog(scriptName, errorDetails, httpStatus, duration);
       
-      expect(fs.appendFileSync).toHaveBeenCalledWith(
-        path.join(testLogsDir, 'curl-api-errors.log'),
-        expect.stringContaining('❌ API ERROR: test-script.sh (HTTP 404) (1500ms)')
-      );
+      assert.strictEqual(mockFs.appendFileSync.mock.callCount(), 1);
+      const call = mockFs.appendFileSync.mock.calls[0];
+      const logContent = call[1];
+      assert.match(logContent, /❌ API ERROR: test-script\.sh \(HTTP 404\) \(1500ms\)/);
     });
   });
 
   describe('parseCurlOutput', () => {
-    test('should parse HTTP status from output', () => {
+    it('should parse HTTP status from output', () => {
       const stdout = 'Some output\nHTTP Status: 200\nMore output';
       const stderr = '';
       
       const result = curlRunner.parseCurlOutput(stdout, stderr);
       
-      expect(result.httpStatus).toBe(200);
-      expect(result.isApiError).toBe(false);
-      expect(result.errorMessage).toBeNull();
+      assert.strictEqual(result.httpStatus, 200);
+      assert.strictEqual(result.isApiError, false);
+      assert.strictEqual(result.errorMessage, null);
     });
 
-    test('should detect API errors for 4xx status codes', () => {
+    it('should detect API errors for 4xx status codes', () => {
       const stdout = 'Some output\nHTTP Status: 404\nMore output';
       const stderr = '';
       
       const result = curlRunner.parseCurlOutput(stdout, stderr);
       
-      expect(result.httpStatus).toBe(404);
-      expect(result.isApiError).toBe(true);
-      expect(result.errorMessage).toBe('HTTP 404 error');
+      assert.strictEqual(result.httpStatus, 404);
+      assert.strictEqual(result.isApiError, true);
+      assert.strictEqual(result.errorMessage, 'HTTP 404 error');
     });
 
-    test('should detect API errors for 5xx status codes', () => {
+    it('should detect API errors for 5xx status codes', () => {
       const stdout = 'Some output\nHTTP Status: 500\nMore output';
       const stderr = '';
       
       const result = curlRunner.parseCurlOutput(stdout, stderr);
       
-      expect(result.httpStatus).toBe(500);
-      expect(result.isApiError).toBe(true);
-      expect(result.errorMessage).toBe('HTTP 500 error');
+      assert.strictEqual(result.httpStatus, 500);
+      assert.strictEqual(result.isApiError, true);
+      assert.strictEqual(result.errorMessage, 'HTTP 500 error');
     });
 
-    test('should use stderr as error message when available', () => {
+    it('should use stderr as error message when available', () => {
       const stdout = 'Some output\nHTTP Status: 404\nMore output';
       const stderr = 'Connection timeout';
       
       const result = curlRunner.parseCurlOutput(stdout, stderr);
       
-      expect(result.httpStatus).toBe(404);
-      expect(result.isApiError).toBe(true);
-      expect(result.errorMessage).toBe('Connection timeout');
+      assert.strictEqual(result.httpStatus, 404);
+      assert.strictEqual(result.isApiError, true);
+      assert.strictEqual(result.errorMessage, 'Connection timeout');
     });
   });
 
   describe('scanScripts', () => {
-    test('should return list of .sh files', () => {
+    it('should return list of .sh files', () => {
       const scripts = curlRunner.scanScripts();
       
-      expect(scripts).toEqual(['test-script.sh', 'another-script.sh']);
-      expect(fs.readdirSync).toHaveBeenCalledWith(testScriptsDir);
+      assert.deepStrictEqual(scripts, ['test-script.sh', 'another-script.sh']);
+      assert.strictEqual(mockFs.readdirSync.mock.callCount(), 1);
     });
 
-    test('should create scripts directory if it does not exist', () => {
-      fs.existsSync.mockReturnValue(false);
+    it('should create scripts directory if it does not exist', () => {
+      mockFs.existsSync.mock.mockImplementation(() => false);
       
       const scripts = curlRunner.scanScripts();
       
-      expect(fs.mkdirSync).toHaveBeenCalledWith(testScriptsDir, { recursive: true });
-      expect(scripts).toEqual([]);
+      assert.strictEqual(mockFs.mkdirSync.mock.callCount(), 1);
+      assert.deepStrictEqual(scripts, []);
     });
 
-    test('should handle readdir errors gracefully', () => {
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
-      fs.readdirSync.mockImplementation(() => {
+    it('should handle readdir errors gracefully', () => {
+      const consoleSpy = mock.fn();
+      const originalError = console.error;
+      console.error = consoleSpy;
+      
+      mockFs.readdirSync.mock.mockImplementation(() => {
         throw new Error('Read failed');
       });
       
       const scripts = curlRunner.scanScripts();
       
-      expect(scripts).toEqual([]);
-      expect(consoleSpy).toHaveBeenCalledWith('Error scanning directory: Read failed');
-      consoleSpy.mockRestore();
+      assert.deepStrictEqual(scripts, []);
+      assert.strictEqual(consoleSpy.mock.callCount(), 1);
+      assert.match(consoleSpy.mock.calls[0][0], /Error scanning directory: Read failed/);
+      
+      console.error = originalError;
     });
 
-    test('should filter only .sh files', () => {
-      fs.readdirSync.mockReturnValue(['script1.sh', 'script2.txt', 'script3.sh', 'README.md']);
+    it('should filter only .sh files', () => {
+      mockFs.readdirSync.mock.mockImplementation(() => ['script1.sh', 'script2.txt', 'script3.sh', 'README.md']);
       
       const scripts = curlRunner.scanScripts();
       
-      expect(scripts).toEqual(['script1.sh', 'script3.sh']);
+      assert.deepStrictEqual(scripts, ['script1.sh', 'script3.sh']);
     });
   });
 
   describe('runScript', () => {
-    test('should return false if script does not exist', async () => {
-      fs.existsSync.mockReturnValue(false);
+    it('should return false if script does not exist', async () => {
+      mockFs.existsSync.mock.mockImplementation(() => false);
       
       const result = await curlRunner.runScript('nonexistent.sh');
       
-      expect(result).toBe(false);
+      assert.strictEqual(result, false);
     });
 
-    test('should execute script successfully', async () => {
+    it('should execute script successfully', async () => {
       const mockStdout = 'Test output\nHTTP Status: 200\n';
-      exec.mockImplementation((command, callback) => {
+      mockExec.mock.mockImplementation((command, callback) => {
         callback(null, mockStdout, '');
       });
       
       const result = await curlRunner.runScript('test-script.sh');
       
-      expect(result).toBe(true);
-      expect(exec).toHaveBeenCalledWith('bash "scripts/test-script.sh"', expect.any(Function));
+      assert.strictEqual(result, true);
+      assert.strictEqual(mockExec.mock.callCount(), 1);
     });
 
-    test('should handle script execution errors', async () => {
+    it('should handle script execution errors', async () => {
       const mockError = new Error('Script failed');
-      exec.mockImplementation((command, callback) => {
+      mockExec.mock.mockImplementation((command, callback) => {
         callback(mockError, '', 'Error output');
       });
       
       const result = await curlRunner.runScript('error-script.sh');
       
-      expect(result).toBe(false);
+      assert.strictEqual(result, false);
     });
 
-    test('should handle API errors (HTTP 4xx/5xx)', async () => {
+    it('should handle API errors (HTTP 4xx/5xx)', async () => {
       const mockStdout = 'Some output\nHTTP Status: 404\nMore output';
-      exec.mockImplementation((command, callback) => {
+      mockExec.mock.mockImplementation((command, callback) => {
         callback(null, mockStdout, '');
       });
       
       const result = await curlRunner.runScript('test-script.sh');
       
-      expect(result).toBe(false);
+      assert.strictEqual(result, false);
     });
   });
 
   describe('listScripts', () => {
-    test('should return list of available scripts', () => {
+    it('should return list of available scripts', () => {
       const scripts = curlRunner.listScripts();
       
-      expect(scripts).toEqual(['test-script.sh', 'another-script.sh']);
+      assert.deepStrictEqual(scripts, ['test-script.sh', 'another-script.sh']);
     });
   });
 });

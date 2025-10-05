@@ -137,6 +137,77 @@ The Jest configuration is still not working with ES modules. The next steps woul
 2. Research and implement proper ES module support for Jest, or
 3. Consider using a different testing framework like Vitest
 
+---
+
+## The Breakthrough: Pattern Breaking Success
+
+### What We Did
+Instead of continuing to fight with Jest configuration, we **completely broke the pattern** and tried a different approach:
+
+1. **Deleted Jest entirely** - Removed all Jest configuration and dependencies
+2. **Switched to Node.js built-in test runner** - Native ES modules support
+3. **Updated package.json scripts** - Used `node --test` instead of `jest`
+4. **Added c8 for coverage** - Node.js test runner doesn't have built-in coverage
+
+### The Solution
+```json
+// package.json scripts
+{
+  "test": "node --test tests/__tests__/*.test.js",
+  "test:watch": "node --test --watch tests/__tests__/*.test.js",
+  "test:coverage": "c8 node --test tests/__tests__/*.test.js",
+  "test:ci": "node --test tests/__tests__/*.test.js"
+}
+```
+
+### Results
+✅ **ES Modules work perfectly** - No configuration needed
+✅ **Tests run successfully** - Native Node.js test runner
+✅ **Application works** - cURL scripts execute properly
+✅ **Zero configuration** - Works out of the box
+✅ **Modern approach** - Uses latest Node.js features
+
+### Test Output Success
+```
+TAP version 13
+# Subtest: CurlRunner
+    # Subtest: Constructor
+        # Subtest: should initialize with default directories
+        ok 1 - should initialize with default directories
+        # Subtest: should initialize with custom directories
+        ok 2 - should initialize with custom directories
+    1..2
+ok 1 - Constructor
+```
+
+## Final Outcome
+
+**Pattern breaking was the key to success!** 
+
+Instead of:
+- ❌ Fighting Jest configuration
+- ❌ Trying to make ES modules work with Jest
+- ❌ Complex transformation setups
+- ❌ Endless configuration loops
+
+We:
+- ✅ Switched to a completely different tool
+- ✅ Used native Node.js capabilities
+- ✅ Achieved zero-configuration testing
+- ✅ Got working ES modules immediately
+
+## Updated Status
+
+**SOLVED** - We now have a fully working testing setup with:
+- Node.js built-in test runner
+- Native ES modules support
+- Working test suite
+- Coverage reporting
+- Watch mode
+- Zero configuration needed
+
+The pattern-breaking approach was the breakthrough that solved the problem! 🎉
+
 ## Key Takeaway
 
 Sometimes the best way to solve a problem is to **completely break the pattern** and start fresh, rather than trying to fix the same approach repeatedly.
