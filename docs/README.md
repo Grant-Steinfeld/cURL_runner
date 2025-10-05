@@ -13,6 +13,7 @@ This directory contains all documentation for the cURL Runner project, organized
 
 ### **System Requirements**
 - **[Node.js Version Requirements](NODE_VERSION_REQUIREMENTS.md)** - Detailed analysis of Node.js version compatibility and feature requirements
+- **[Node.js Compatibility Analysis](NODE_COMPATIBILITY_ANALYSIS.md)** - Visual analysis with Mermaid diagrams of version compatibility and migration paths
 
 ## 🏗️ Project Structure
 

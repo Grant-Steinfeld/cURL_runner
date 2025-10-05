@@ -234,6 +234,7 @@ Additional documentation is available in the [`docs/`](docs/) directory:
 - **[Architecture & Design](docs/)** - Detailed documentation about the project structure and design decisions
 - **[Separation of Concerns](docs/SEPARATION_OF_CONCERNS.md)** - Modular architecture implementation
 - **[Test Mocking Update](docs/TEST_MOCKING_UPDATE.md)** - Testing strategies and utility class testing
+- **[Node.js Compatibility Analysis](docs/NODE_COMPATIBILITY_ANALYSIS.md)** - Visual analysis with Mermaid diagrams
 - **[Jest Migration History](docs/HowJestNeededToBeConfiguredForESModules.md)** - Historical context of the Jest to Node.js test runner migration
 
 ## License
