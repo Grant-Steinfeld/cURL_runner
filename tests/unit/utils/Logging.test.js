@@ -2,7 +2,7 @@ import { describe, it, beforeEach, mock } from 'node:test';
 import assert from 'node:assert';
 import fs from 'fs';
 import path from 'path';
-import { CurlRunner } from '../../index.js';
+import { CurlRunner } from '../../../src/lib/CurlRunner.js';
 
 // Mock fs
 const mockFs = {
