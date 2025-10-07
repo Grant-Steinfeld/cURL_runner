@@ -31,6 +31,15 @@ npm install @curl-runner/core
 - **Operating Systems**: macOS, Linux, Windows
 - **Dependencies**: Zero external dependencies (maximum security)
 
+### 🔒 **Automatic Compatibility Enforcement**
+
+The library automatically enforces Node.js version compatibility when imported:
+
+- **✅ Supported Versions**: v18.0.0+ (library loads normally)
+- **⚠️ Unsupported Versions**: <v18.0.0 (throws clear error with upgrade instructions)
+- **📢 Warnings**: Non-recommended versions show helpful warnings
+- **🔧 Programmatic Access**: Check compatibility status in your code
+
 ## 🎯 Quick Start
 
 ### Basic Usage
@@ -69,6 +78,34 @@ const parsed = parser.parseCurlOutput(curlOutput);
 // File system operations
 const fs = new FileSystem();
 const scripts = await fs.scanScripts('./scripts');
+```
+
+### Compatibility Checking
+
+```javascript
+import { 
+  getCompatibilityInfo, 
+  isTestedVersion, 
+  isRecommendedVersion,
+  getCompatibilityMatrix 
+} from '@curl-runner/core';
+
+// Check compatibility status
+const info = getCompatibilityInfo();
+console.log(`Node.js ${info.currentVersion} is ${info.isSupported ? 'supported' : 'not supported'}`);
+
+// Check specific version ranges
+if (isTestedVersion()) {
+  console.log('Using a tested Node.js version');
+}
+
+if (isRecommendedVersion()) {
+  console.log('Using a recommended Node.js version');
+}
+
+// Get full compatibility matrix
+const matrix = getCompatibilityMatrix();
+console.log('Compatibility matrix:', matrix);
 ```
 
 ## 📚 API Reference

@@ -74,3 +74,61 @@ export declare class FileSystem {
 export declare const DEFAULT_CONFIG: CurlRunnerConfig;
 export declare const VERSION: string;
 export declare const LIBRARY_NAME: string;
+
+// Compatibility functions
+export interface CompatibilityStatus {
+  currentVersion: string;
+  minCompatibility: {
+    isCompatible: boolean;
+    isMinCompatible: boolean;
+    isMaxCompatible: boolean;
+    minVersion: string;
+    maxVersion: string;
+  };
+  recommendedCompatibility: {
+    isCompatible: boolean;
+    isMinCompatible: boolean;
+    isMaxCompatible: boolean;
+    minVersion: string;
+    maxVersion: string;
+  };
+  testedCompatibility: {
+    isCompatible: boolean;
+    isMinCompatible: boolean;
+    isMaxCompatible: boolean;
+    minVersion: string;
+    maxVersion: string;
+  };
+  isSupported: boolean;
+  isRecommended: boolean;
+  isTested: boolean;
+}
+
+export interface CompatibilityMatrix {
+  current: string;
+  minimum: string;
+  recommended: {
+    min: string;
+    max: string;
+  };
+  tested: {
+    min: string;
+    max: string;
+  };
+  status: {
+    isSupported: boolean;
+    isRecommended: boolean;
+    isTested: boolean;
+  };
+}
+
+export interface CompatibilityOptions {
+  strict?: boolean;
+  warn?: boolean;
+}
+
+export declare function enforceCompatibility(options?: CompatibilityOptions): CompatibilityStatus;
+export declare function getCompatibilityInfo(): CompatibilityStatus;
+export declare function isTestedVersion(): boolean;
+export declare function isRecommendedVersion(): boolean;
+export declare function getCompatibilityMatrix(): CompatibilityMatrix;
