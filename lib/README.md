@@ -22,6 +22,15 @@ Core library for running cURL scripts with comprehensive logging and error handl
 npm install @curl-runner/core
 ```
 
+## 📋 Requirements
+
+- **Node.js**: >=18.0.0 (ES modules and built-in test runner)
+  - **Tested**: v22.18.0 (current)
+  - **Compatible**: v18.0.0 - v24.x.x
+  - **Recommended**: v22.x.x - v24.x.x for best performance
+- **Operating Systems**: macOS, Linux, Windows
+- **Dependencies**: Zero external dependencies (maximum security)
+
 ## 🎯 Quick Start
 
 ### Basic Usage
