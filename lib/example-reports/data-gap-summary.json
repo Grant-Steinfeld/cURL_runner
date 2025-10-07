@@ -1,0 +1,47 @@
+{
+  "metadata": {
+    "generatedAt": "2025-10-07T19:51:05.532Z",
+    "totalWeeks": 4,
+    "reportVersion": "1.0.0"
+  },
+  "overallMetrics": {
+    "totalScripts": 12,
+    "totalSuccessfulScripts": 0,
+    "totalFailedScripts": 12,
+    "averageSuccessRate": 0,
+    "totalDataGaps": 12,
+    "totalAlerts": 16
+  },
+  "weeklyBreakdown": [
+    {
+      "week": 1,
+      "successRate": 0,
+      "dataGapsCount": 3,
+      "alertsCount": 4
+    },
+    {
+      "week": 2,
+      "successRate": 0,
+      "dataGapsCount": 3,
+      "alertsCount": 4
+    },
+    {
+      "week": 3,
+      "successRate": 0,
+      "dataGapsCount": 3,
+      "alertsCount": 4
+    },
+    {
+      "week": 4,
+      "successRate": 0,
+      "dataGapsCount": 3,
+      "alertsCount": 4
+    }
+  ],
+  "trends": {
+    "successRateTrend": "stable",
+    "dataGapsTrend": "stable",
+    "errorRateTrend": "stable"
+  },
+  "recommendations": []
+}

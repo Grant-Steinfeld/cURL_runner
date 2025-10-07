@@ -1,0 +1,111 @@
+{
+  "metadata": {
+    "generatedAt": "2025-10-07T19:51:00.428Z",
+    "week": 1,
+    "totalWeeks": 4,
+    "reportVersion": "1.0.0"
+  },
+  "summary": {
+    "totalScripts": 3,
+    "successfulScripts": 0,
+    "failedScripts": 3,
+    "overallSuccessRate": 0,
+    "overallErrorRate": 1,
+    "dataGapsCount": 3,
+    "alertsCount": 4
+  },
+  "analysis": {
+    "week": 1,
+    "totalScripts": 3,
+    "successfulScripts": 0,
+    "failedScripts": 3,
+    "dataGaps": [
+      {
+        "script": "unknown",
+        "successRate": 0,
+        "missingData": 1,
+        "severity": "critical"
+      },
+      {
+        "script": "unknown",
+        "successRate": 0,
+        "missingData": 1,
+        "severity": "critical"
+      },
+      {
+        "script": "unknown",
+        "successRate": 0,
+        "missingData": 1,
+        "severity": "critical"
+      }
+    ],
+    "errorRates": {
+      "unknown": 1
+    },
+    "successRates": {
+      "unknown": 0
+    },
+    "trends": {},
+    "alerts": [
+      {
+        "type": "error_rate",
+        "script": "unknown",
+        "errorRate": 1,
+        "threshold": 0.05,
+        "severity": "critical"
+      },
+      {
+        "type": "error_rate",
+        "script": "unknown",
+        "errorRate": 1,
+        "threshold": 0.05,
+        "severity": "critical"
+      },
+      {
+        "type": "error_rate",
+        "script": "unknown",
+        "errorRate": 1,
+        "threshold": 0.05,
+        "severity": "critical"
+      },
+      {
+        "type": "overall_performance",
+        "overallSuccessRate": 0,
+        "threshold": 0.95,
+        "severity": "critical"
+      }
+    ],
+    "overallSuccessRate": 0,
+    "overallErrorRate": 1
+  },
+  "recommendations": [
+    {
+      "priority": "critical",
+      "category": "data_gaps",
+      "message": "Critical data gaps detected in 3 script(s)",
+      "scripts": [
+        "unknown",
+        "unknown",
+        "unknown"
+      ],
+      "action": "Immediate investigation and remediation required"
+    },
+    {
+      "priority": "critical",
+      "category": "error_rates",
+      "message": "Critical error rates detected in 3 script(s)",
+      "scripts": [
+        "unknown",
+        "unknown",
+        "unknown"
+      ],
+      "action": "Check API endpoints and script configurations immediately"
+    },
+    {
+      "priority": "high",
+      "category": "overall_performance",
+      "message": "Overall success rate is 0.0%",
+      "action": "Review all scripts and consider system-wide improvements"
+    }
+  ]
+}

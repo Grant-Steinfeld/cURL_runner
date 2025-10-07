@@ -39,10 +39,87 @@ export interface HttpErrorInfo {
 }
 
 export declare class CurlRunner {
-  constructor(config?: Partial<CurlRunnerConfig>);
+  constructor(scriptsDir?: string, logsDir?: string, reportsDir?: string, weeks?: number);
   runAllScripts(): Promise<CurlResult[]>;
   runScript(scriptName: string): Promise<CurlResult>;
   scanScripts(): Promise<ScriptInfo[]>;
+  runWeeklyAnalysis(weekNumber?: number): Promise<any>;
+  runMultiWeekAnalysis(): Promise<any>;
+  getWeeklyReportingConfig(): any;
+}
+
+export interface WeeklyReportData {
+  week: number;
+  scripts: Array<{
+    name: string;
+    results: CurlResult[];
+  }>;
+}
+
+export interface DataGapAnalysis {
+  week: number;
+  totalScripts: number;
+  successfulScripts: number;
+  failedScripts: number;
+  dataGaps: Array<{
+    script: string;
+    successRate: number;
+    missingData: number;
+    severity: 'critical' | 'high' | 'medium';
+  }>;
+  errorRates: Record<string, number>;
+  successRates: Record<string, number>;
+  overallSuccessRate: number;
+  overallErrorRate: number;
+  alerts: Array<{
+    type: string;
+    script?: string;
+    errorRate?: number;
+    threshold?: number;
+    severity: 'critical' | 'high' | 'medium';
+  }>;
+}
+
+export interface WeeklyReport {
+  metadata: {
+    generatedAt: string;
+    week: number;
+    totalWeeks: number;
+    reportVersion: string;
+  };
+  summary: {
+    totalScripts: number;
+    successfulScripts: number;
+    failedScripts: number;
+    overallSuccessRate: number;
+    overallErrorRate: number;
+    dataGapsCount: number;
+    alertsCount: number;
+  };
+  analysis: DataGapAnalysis;
+  recommendations: Array<{
+    priority: 'critical' | 'high' | 'medium';
+    category: string;
+    message: string;
+    scripts?: string[];
+    action: string;
+  }>;
+}
+
+export declare class WeeklyReporter {
+  constructor(reportsDir?: string, weeks?: number);
+  analyzeDataGaps(weekData: WeeklyReportData): DataGapAnalysis;
+  generateWeeklyReport(weekData: WeeklyReportData): WeeklyReport;
+  generateRecommendations(analysis: DataGapAnalysis): Array<{
+    priority: 'critical' | 'high' | 'medium';
+    category: string;
+    message: string;
+    scripts?: string[];
+    action: string;
+  }>;
+  saveWeeklyReport(report: WeeklyReport): Promise<string>;
+  generateSummaryReport(weeklyReports: WeeklyReport[]): any;
+  saveSummaryReport(summary: any): Promise<string>;
 }
 
 export declare class Logger {
