@@ -1,0 +1,88 @@
+name: Publish Library
+
+on:
+  push:
+    branches: [ main ]
+    paths: [ 'lib/**' ]
+  workflow_dispatch:
+
+jobs:
+  publish:
+    name: Publish to NPM
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '22'
+        registry-url: 'https://registry.npmjs.org'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: |
+        cd lib
+        npm ci
+        
+    - name: Run tests
+      run: |
+        cd lib
+        npm test
+        
+    - name: Build library
+      run: |
+        cd lib
+        npm run build
+        
+    - name: Check if version changed
+      id: version-check
+      run: |
+        cd lib
+        CURRENT_VERSION=$(npm pkg get version | tr -d '"')
+        echo "Current version: $CURRENT_VERSION"
+        
+        # Check if package was published with this version
+        if npm view curl-runner-core@$CURRENT_VERSION version > /dev/null 2>&1; then
+          echo "Version $CURRENT_VERSION already published"
+          echo "should_publish=false" >> $GITHUB_OUTPUT
+        else
+          echo "Version $CURRENT_VERSION not published yet"
+          echo "should_publish=true" >> $GITHUB_OUTPUT
+        fi
+        
+    - name: Publish to NPM
+      if: steps.version-check.outputs.should_publish == 'true'
+      run: |
+        cd lib
+        npm publish
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        
+    - name: Create GitHub Release
+      if: steps.version-check.outputs.should_publish == 'true'
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: lib-v${{ steps.version-check.outputs.CURRENT_VERSION }}
+        release_name: Library Release v${{ steps.version-check.outputs.CURRENT_VERSION }}
+        body: |
+          ## curl-runner-core v${{ steps.version-check.outputs.CURRENT_VERSION }}
+          
+          ### Changes
+          - See commit history for detailed changes
+          
+          ### Installation
+          ```bash
+          npm install curl-runner-core@${{ steps.version-check.outputs.CURRENT_VERSION }}
+          ```
+          
+          ### Documentation
+          - [NPM Package](https://www.npmjs.com/package/curl-runner-core)
+          - [GitHub Repository](https://github.com/Grant-Steinfeld/cURL_runner)
+        draft: false
+        prerelease: false

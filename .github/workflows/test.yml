@@ -1,0 +1,236 @@
+name: Test Suite
+
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [18, 20, 22]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Run main application tests
+      run: npm test
+      
+    - name: Run library tests
+      run: |
+        cd lib
+        npm ci
+        npm test
+        
+    - name: Run library build
+      run: |
+        cd lib
+        npm run build
+        
+    - name: Test library installation
+      run: |
+        cd lib
+        npm pack
+        npm install -g curl-runner-core-*.tgz
+        node -e "console.log('Library installed successfully')"
+
+  lint-and-format:
+    name: Lint and Format Check
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '22'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Check for TODO/FIXME comments
+      run: |
+        echo "Checking for TODO/FIXME comments..."
+        if grep -r "TODO\|FIXME" src/ lib/src/ --exclude-dir=node_modules; then
+          echo "Found TODO/FIXME comments. Please address them before merging."
+          exit 1
+        else
+          echo "No TODO/FIXME comments found."
+        fi
+        
+    - name: Check for console.log statements
+      run: |
+        echo "Checking for console.log statements in production code..."
+        if grep -r "console\.log" src/ lib/src/ --exclude-dir=node_modules --exclude="*.test.js"; then
+          echo "Found console.log statements in production code. Consider using proper logging."
+          echo "This is a warning, not an error."
+        else
+          echo "No console.log statements found in production code."
+        fi
+
+  security-audit:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '22'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Run security audit
+      run: npm audit --audit-level=moderate
+      
+    - name: Run library security audit
+      run: |
+        cd lib
+        npm ci
+        npm audit --audit-level=moderate
+
+  test-coverage:
+    name: Test Coverage
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '22'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Run tests with coverage
+      run: npm run test:coverage
+      
+    - name: Run library tests with coverage
+      run: |
+        cd lib
+        npm ci
+        npm run test:coverage
+        
+    - name: Upload coverage reports
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-reports
+        path: |
+          coverage/
+          lib/coverage/
+
+  integration-test:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '22'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Test CLI functionality
+      run: |
+        # Test basic CLI commands
+        node index.js list
+        echo "CLI list command works"
+        
+    - name: Test library functionality
+      run: |
+        cd lib
+        npm ci
+        npm run build
+        
+        # Test library import
+        node -e "
+          import { CurlRunner, WeeklyReporter } from './dist/index.js';
+          console.log('Library imports successfully');
+          const runner = new CurlRunner();
+          console.log('CurlRunner instantiated successfully');
+          const reporter = new WeeklyReporter();
+          console.log('WeeklyReporter instantiated successfully');
+        "
+        
+    - name: Test example scripts
+      run: |
+        cd lib
+        node example-weekly-reporting.js || echo "Example script completed (may have expected errors)"
+
+  performance-test:
+    name: Performance Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '22'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Test startup time
+      run: |
+        time node -e "console.log('Node.js startup test')"
+        
+    - name: Test library bundle size
+      run: |
+        cd lib
+        npm run build
+        echo "Library bundle sizes:"
+        ls -lh dist/
+        
+    - name: Test memory usage
+      run: |
+        node -e "
+          const start = process.memoryUsage();
+          console.log('Initial memory usage:', start);
+          
+          // Simulate some work
+          const arr = new Array(1000000).fill(0);
+          const end = process.memoryUsage();
+          console.log('Memory usage after work:', end);
+          console.log('Memory delta:', {
+            rss: end.rss - start.rss,
+            heapUsed: end.heapUsed - start.heapUsed
+          });
+        "

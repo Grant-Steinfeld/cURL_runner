@@ -1,0 +1,150 @@
+name: PR Requirements
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  pr-validation:
+    name: PR Validation
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        
+    - name: Check PR title format
+      run: |
+        echo "Checking PR title format..."
+        TITLE="${{ github.event.pull_request.title }}"
+        echo "PR Title: $TITLE"
+        
+        # Check if title follows conventional commit format
+        if echo "$TITLE" | grep -qE "^(feat|fix|docs|style|refactor|test|chore)(\(.+\))?: .+"; then
+          echo "✅ PR title follows conventional commit format"
+        else
+          echo "❌ PR title should follow conventional commit format: type(scope): description"
+          echo "Examples: feat: add new feature, fix: resolve bug, docs: update README"
+          exit 1
+        fi
+        
+    - name: Check for breaking changes
+      run: |
+        echo "Checking for breaking changes..."
+        TITLE="${{ github.event.pull_request.title }}"
+        BODY="${{ github.event.pull_request.body }}"
+        
+        if echo "$TITLE" | grep -q "BREAKING CHANGE\|!"; then
+          echo "⚠️ Breaking change detected in title"
+        elif echo "$BODY" | grep -q "BREAKING CHANGE"; then
+          echo "⚠️ Breaking change detected in body"
+        else
+          echo "✅ No breaking changes detected"
+        fi
+        
+    - name: Check PR size
+      run: |
+        echo "Checking PR size..."
+        ADDITIONS="${{ github.event.pull_request.additions }}"
+        DELETIONS="${{ github.event.pull_request.deletions }}"
+        CHANGED_FILES="${{ github.event.pull_request.changed_files }}"
+        
+        echo "Additions: $ADDITIONS"
+        echo "Deletions: $DELETIONS"
+        echo "Changed files: $CHANGED_FILES"
+        
+        if [ "$ADDITIONS" -gt 1000 ] || [ "$CHANGED_FILES" -gt 20 ]; then
+          echo "⚠️ Large PR detected. Consider breaking into smaller PRs."
+        else
+          echo "✅ PR size is reasonable"
+        fi
+        
+    - name: Check for merge commits
+      run: |
+        echo "Checking for merge commits..."
+        if git log --oneline ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }} | grep -q "Merge"; then
+          echo "⚠️ Merge commits detected. Consider rebasing instead."
+        else
+          echo "✅ No merge commits found"
+        fi
+        
+    - name: Check commit message format
+      run: |
+        echo "Checking commit message format..."
+        git log --oneline ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }} | while read commit; do
+          if echo "$commit" | grep -qE "^(feat|fix|docs|style|refactor|test|chore)(\(.+\))?: .+"; then
+            echo "✅ $commit"
+          else
+            echo "❌ $commit - should follow conventional commit format"
+          fi
+        done
+        
+    - name: Check for WIP commits
+      run: |
+        echo "Checking for WIP commits..."
+        if git log --oneline ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }} | grep -qi "wip\|work in progress"; then
+          echo "⚠️ WIP commits detected. Consider using draft PR instead."
+        else
+          echo "✅ No WIP commits found"
+        fi
+        
+    - name: Check for TODO/FIXME in code
+      run: |
+        echo "Checking for TODO/FIXME in code..."
+        if git diff ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }} | grep -q "TODO\|FIXME"; then
+          echo "⚠️ TODO/FIXME comments found in changes. Consider addressing them."
+        else
+          echo "✅ No TODO/FIXME comments in changes"
+        fi
+
+  file-changes:
+    name: File Changes Analysis
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        
+    - name: Analyze changed files
+      run: |
+        echo "Analyzing changed files..."
+        git diff --name-only ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }} > changed_files.txt
+        cat changed_files.txt
+        
+        echo ""
+        echo "File change analysis:"
+        echo "===================="
+        
+        # Check for package.json changes
+        if grep -q "package.json" changed_files.txt; then
+          echo "📦 package.json modified - dependency changes detected"
+        fi
+        
+        # Check for README changes
+        if grep -q "README" changed_files.txt; then
+          echo "📝 README modified - documentation changes detected"
+        fi
+        
+        # Check for test files
+        if grep -q "test" changed_files.txt; then
+          echo "🧪 Test files modified - test changes detected"
+        fi
+        
+        # Check for source code changes
+        if grep -q "src/" changed_files.txt; then
+          echo "💻 Source code modified - functionality changes detected"
+        fi
+        
+        # Check for GitHub Actions changes
+        if grep -q ".github/" changed_files.txt; then
+          echo "⚙️ GitHub Actions modified - CI/CD changes detected"
+        fi
+        
+        # Check for library changes
+        if grep -q "lib/" changed_files.txt; then
+          echo "📚 Library code modified - library changes detected"
+        fi

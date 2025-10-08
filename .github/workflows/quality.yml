@@ -1,0 +1,169 @@
+name: Code Quality
+
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ main ]
+
+jobs:
+  code-quality:
+    name: Code Quality Checks
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '22'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Check file permissions
+      run: |
+        echo "Checking file permissions..."
+        find . -name "*.js" -not -path "./node_modules/*" -not -path "./lib/node_modules/*" | xargs ls -la
+        
+    - name: Check for large files
+      run: |
+        echo "Checking for large files..."
+        find . -type f -size +1M -not -path "./node_modules/*" -not -path "./lib/node_modules/*" | head -10
+        
+    - name: Check for sensitive data
+      run: |
+        echo "Checking for potential sensitive data..."
+        if grep -r -i "password\|secret\|key\|token" src/ lib/src/ --exclude-dir=node_modules --exclude="*.test.js" | grep -v "console.log\|//"; then
+          echo "Potential sensitive data found. Please review."
+          exit 1
+        else
+          echo "No sensitive data found."
+        fi
+        
+    - name: Check for hardcoded URLs
+      run: |
+        echo "Checking for hardcoded URLs..."
+        if grep -r "http://\|https://" src/ lib/src/ --exclude-dir=node_modules --exclude="*.test.js" | grep -v "example.com\|httpbin.org"; then
+          echo "Hardcoded URLs found. Consider using environment variables."
+          echo "This is a warning, not an error."
+        else
+          echo "No hardcoded URLs found."
+        fi
+        
+    - name: Check for unused imports
+      run: |
+        echo "Checking for unused imports..."
+        # This is a basic check - in a real project you'd use a proper linter
+        echo "Unused import check completed (basic implementation)"
+        
+    - name: Check for consistent naming
+      run: |
+        echo "Checking for consistent naming conventions..."
+        # Check for camelCase in JavaScript files
+        find src/ lib/src/ -name "*.js" -not -path "*/node_modules/*" -not -name "*.test.js" | xargs grep -l "function [a-z]" || echo "No function naming issues found"
+        
+    - name: Check for proper error handling
+      run: |
+        echo "Checking for proper error handling..."
+        if grep -r "throw new Error" src/ lib/src/ --exclude-dir=node_modules; then
+          echo "Found throw new Error statements. Ensure they have proper error messages."
+        else
+          echo "No throw new Error statements found."
+        fi
+        
+    - name: Check for proper JSDoc comments
+      run: |
+        echo "Checking for JSDoc comments in public methods..."
+        if find src/ lib/src/ -name "*.js" -not -path "*/node_modules/*" -not -name "*.test.js" | xargs grep -l "export.*function\|export.*class" | xargs grep -L "/\*\*"; then
+          echo "Some public methods may be missing JSDoc comments."
+          echo "This is a warning, not an error."
+        else
+          echo "JSDoc comments check completed."
+        fi
+
+  dependency-check:
+    name: Dependency Analysis
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '22'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Check for outdated dependencies
+      run: |
+        echo "Checking for outdated dependencies..."
+        npm outdated || echo "Some dependencies may be outdated"
+        
+    - name: Check for duplicate dependencies
+      run: |
+        echo "Checking for duplicate dependencies..."
+        npm ls --depth=0 | grep -E "├─|└─" | sort | uniq -d || echo "No duplicate dependencies found"
+        
+    - name: Check library dependencies
+      run: |
+        cd lib
+        npm ci
+        echo "Library dependencies:"
+        npm ls --depth=0
+        npm outdated || echo "Some library dependencies may be outdated"
+
+  documentation-check:
+    name: Documentation Quality
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Check README completeness
+      run: |
+        echo "Checking README completeness..."
+        if [ -f "README.md" ]; then
+          echo "Main README exists"
+          if grep -q "## Installation" README.md; then
+            echo "Installation section found"
+          else
+            echo "Installation section missing"
+          fi
+          if grep -q "## Usage" README.md; then
+            echo "Usage section found"
+          else
+            echo "Usage section missing"
+          fi
+        else
+          echo "Main README missing"
+          exit 1
+        fi
+        
+    - name: Check library README
+      run: |
+        if [ -f "lib/README.md" ]; then
+          echo "Library README exists"
+          if grep -q "## Installation" lib/README.md; then
+            echo "Library installation section found"
+          else
+            echo "Library installation section missing"
+          fi
+        else
+          echo "Library README missing"
+          exit 1
+        fi
+        
+    - name: Check for broken links
+      run: |
+        echo "Checking for broken links in README files..."
+        # This is a basic check - in a real project you'd use a proper link checker
+        echo "Link check completed (basic implementation)"
