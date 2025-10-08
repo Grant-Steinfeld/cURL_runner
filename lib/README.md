@@ -9,22 +9,16 @@ Core library for running cURL scripts with comprehensive logging and error handl
 ## 🚀 Features
 
 - **🔄 cURL Script Execution** - Run individual or batch cURL scripts
-<<<<<<< HEAD
-=======
 - **📊 Weekly Data Gap Analysis** - Comprehensive reporting over configurable weeks (default: 52)
 - **🔍 Data Gap Detection** - Automatic identification of missing data and performance issues
 - **📈 Trend Analysis** - Track success rates, error patterns, and performance trends over time
->>>>>>> main
 - **📊 Comprehensive Logging** - Detailed logs with timestamps and status tracking
 - **🚨 Error Handling** - HTTP error detection and categorization
 - **📁 File Management** - Script discovery and file system utilities
 - **⚡ High Performance** - Optimized for batch processing
 - **🔧 Modular Design** - Use individual components or the full suite
 - **📝 TypeScript Support** - Full type definitions included
-<<<<<<< HEAD
-=======
 - **🔒 Zero Dependencies** - No external dependencies for maximum security
->>>>>>> main
 
 ## 📦 Installation
 
@@ -118,8 +112,6 @@ const matrix = getCompatibilityMatrix();
 console.log('Compatibility matrix:', matrix);
 ```
 
-<<<<<<< HEAD
-=======
 ## 📊 Weekly Data Gap Analysis
 
 The library includes powerful weekly reporting capabilities for data gap analysis and trend tracking.
@@ -223,7 +215,6 @@ The library automatically detects:
 - **Error Rate Alerts**: Error rate > 5%
 - **Overall Performance**: System-wide issues
 
->>>>>>> main
 ## 📚 API Reference
 
 ### CurlRunner
@@ -233,18 +224,6 @@ The main class for running cURL scripts.
 #### Constructor
 
 ```javascript
-<<<<<<< HEAD
-new CurlRunner(config?: CurlRunnerConfig)
-```
-
-**Config Options:**
-- `scriptsDir` (string): Directory containing .sh files (default: './scripts')
-- `logsDir` (string): Directory for log files (default: './var/logs')
-- `reportLogFile` (string): Report log filename (default: 'curl-runner-report.log')
-- `errorLogFile` (string): Error log filename (default: 'curl-api-errors.log')
-- `scriptExtension` (string): Script file extension (default: '.sh')
-- `scriptDelayMs` (number): Delay between scripts (default: 1000)
-=======
 new CurlRunner(scriptsDir?, logsDir?, reportsDir?, weeks?)
 ```
 
@@ -253,7 +232,6 @@ new CurlRunner(scriptsDir?, logsDir?, reportsDir?, weeks?)
 - `logsDir` (string, optional): Directory for log files (default: './var/logs')
 - `reportsDir` (string, optional): Directory for weekly reports (default: './var/reports')
 - `weeks` (number, optional): Number of weeks for analysis (default: 52)
->>>>>>> main
 
 #### Methods
 
@@ -266,8 +244,6 @@ Runs a specific script by name.
 ##### `scanScripts(): Promise<ScriptInfo[]>`
 Scans the scripts directory and returns available scripts.
 
-<<<<<<< HEAD
-=======
 ##### `runWeeklyAnalysis(weekNumber?: number): Promise<WeeklyAnalysisResult>`
 Runs data gap analysis for a specific week and generates a weekly report.
 
@@ -308,7 +284,6 @@ Saves a weekly report to file and returns the file path.
 ##### `saveSummaryReport(summary: SummaryReport): Promise<string>`
 Saves a summary report to file and returns the file path.
 
->>>>>>> main
 ### Logger
 
 Handles all logging operations.

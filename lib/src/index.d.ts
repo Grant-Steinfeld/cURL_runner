@@ -39,12 +39,6 @@ export interface HttpErrorInfo {
 }
 
 export declare class CurlRunner {
-<<<<<<< HEAD
-  constructor(config?: Partial<CurlRunnerConfig>);
-  runAllScripts(): Promise<CurlResult[]>;
-  runScript(scriptName: string): Promise<CurlResult>;
-  scanScripts(): Promise<ScriptInfo[]>;
-=======
   constructor(scriptsDir?: string, logsDir?: string, reportsDir?: string, weeks?: number);
   runAllScripts(): Promise<CurlResult[]>;
   runScript(scriptName: string): Promise<CurlResult>;
@@ -126,7 +120,6 @@ export declare class WeeklyReporter {
   saveWeeklyReport(report: WeeklyReport): Promise<string>;
   generateSummaryReport(weeklyReports: WeeklyReport[]): any;
   saveSummaryReport(summary: any): Promise<string>;
->>>>>>> main
 }
 
 export declare class Logger {

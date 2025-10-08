@@ -1,11 +1,6 @@
 {
-<<<<<<< HEAD
-  "name": "@curl-runner/core",
-  "version": "1.0.0",
-=======
   "name": "curl-runner-core",
   "version": "1.0.1",
->>>>>>> main
   "description": "Core library for running cURL scripts with comprehensive logging and error handling. Zero external dependencies for maximum security.",
   "type": "module",
   "main": "dist/index.js",
@@ -45,10 +40,6 @@
     "linux",
     "win32"
   ],
-<<<<<<< HEAD
-  "dependencies": {},
-=======
->>>>>>> main
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@rollup/plugin-terser": "^0.4.4",
@@ -69,8 +60,4 @@
     "url": "https://github.com/Grant-Steinfeld/cURL_runner/issues"
   },
   "homepage": "https://github.com/Grant-Steinfeld/cURL_runner#readme"
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> main
