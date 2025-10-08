@@ -1,6 +1,6 @@
 {
-  "name": "@curl-runner/core",
-  "version": "1.0.0",
+  "name": "curl-runner-core",
+  "version": "1.0.1",
   "description": "Core library for running cURL scripts with comprehensive logging and error handling. Zero external dependencies for maximum security.",
   "type": "module",
   "main": "dist/index.js",
@@ -40,7 +40,6 @@
     "linux",
     "win32"
   ],
-  "dependencies": {},
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@rollup/plugin-terser": "^0.4.4",
