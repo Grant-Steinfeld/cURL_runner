@@ -2,8 +2,39 @@
 
 A Node.js application that can execute cURL scripts from standalone `.sh` files in a directory.
 
+[![npm version](https://badge.fury.io/js/curl-runner-core.svg)](https://badge.fury.io/js/curl-runner-core)
+[![Node.js Version](https://img.shields.io/node/v/curl-runner-core)](https://nodejs.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+## 📦 NPM Package
+
+This project includes a published NPM library for easy integration:
+
+### Installation
+```bash
+npm install curl-runner-core
+```
+
+### Quick Start
+```javascript
+import { CurlRunner, WeeklyReporter } from 'curl-runner-core';
+
+// Initialize with weekly reporting (default: 52 weeks)
+const runner = new CurlRunner('./scripts', './logs', './reports', 52);
+
+// Run weekly data gap analysis
+const weekResult = await runner.runWeeklyAnalysis(1);
+console.log(`Success Rate: ${(weekResult.report.summary.overallSuccessRate * 100).toFixed(1)}%`);
+```
+
+### Package Links
+- **NPM Package**: [curl-runner-core](https://www.npmjs.com/package/curl-runner-core)
+- **GitHub Repository**: [Grant-Steinfeld/cURL_runner](https://github.com/Grant-Steinfeld/cURL_runner)
+- **Documentation**: [Library README](https://github.com/Grant-Steinfeld/cURL_runner/blob/main/lib/README.md)
+
 ## Features
 
+### CLI Application
 - 🚀 Run all `.sh` files in a directory sequentially
 - 🎯 Run specific `.sh` files by name
 - 📋 List all available `.sh` files
@@ -12,6 +43,17 @@ A Node.js application that can execute cURL scripts from standalone `.sh` files 
 - 📁 Configurable scripts directory
 - 📝 Comprehensive logging to `var/logs` directory
 - 🔍 Detailed execution logs with timestamps
+
+### NPM Library (`curl-runner-core`)
+- 📊 **Weekly Data Gap Analysis** - Comprehensive reporting over configurable weeks (default: 52)
+- 🔍 **Data Gap Detection** - Automatic identification of missing data and performance issues
+- 📈 **Trend Analysis** - Track success rates, error patterns, and performance trends over time
+- 🚨 **Error Handling** - HTTP error detection and categorization
+- 📁 **File Management** - Script discovery and file system utilities
+- ⚡ **High Performance** - Optimized for batch processing
+- 🔧 **Modular Design** - Use individual components or the full suite
+- 📝 **TypeScript Support** - Full type definitions included
+- 🔒 **Zero Dependencies** - No external dependencies for maximum security
 
 ## Installation
 
