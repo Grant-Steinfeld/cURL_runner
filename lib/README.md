@@ -9,12 +9,22 @@ Core library for running cURL scripts with comprehensive logging and error handl
 ## 🚀 Features
 
 - **🔄 cURL Script Execution** - Run individual or batch cURL scripts
+<<<<<<< HEAD
+=======
+- **📊 Weekly Data Gap Analysis** - Comprehensive reporting over configurable weeks (default: 52)
+- **🔍 Data Gap Detection** - Automatic identification of missing data and performance issues
+- **📈 Trend Analysis** - Track success rates, error patterns, and performance trends over time
+>>>>>>> main
 - **📊 Comprehensive Logging** - Detailed logs with timestamps and status tracking
 - **🚨 Error Handling** - HTTP error detection and categorization
 - **📁 File Management** - Script discovery and file system utilities
 - **⚡ High Performance** - Optimized for batch processing
 - **🔧 Modular Design** - Use individual components or the full suite
 - **📝 TypeScript Support** - Full type definitions included
+<<<<<<< HEAD
+=======
+- **🔒 Zero Dependencies** - No external dependencies for maximum security
+>>>>>>> main
 
 ## 📦 Installation
 
@@ -108,6 +118,112 @@ const matrix = getCompatibilityMatrix();
 console.log('Compatibility matrix:', matrix);
 ```
 
+<<<<<<< HEAD
+=======
+## 📊 Weekly Data Gap Analysis
+
+The library includes powerful weekly reporting capabilities for data gap analysis and trend tracking.
+
+### Weekly Reporting Configuration
+
+```javascript
+import { CurlRunner, DEFAULT_CONFIG } from '@curl-runner/core';
+
+// Initialize with weekly reporting (default: 52 weeks)
+const runner = new CurlRunner(
+  './scripts',           // Scripts directory
+  './logs',              // Logs directory
+  './reports',           // Reports directory
+  52                     // Number of weeks to analyze
+);
+
+// Get configuration
+const config = runner.getWeeklyReportingConfig();
+console.log(`Weeks: ${config.weeks}`);
+console.log(`Success Rate Threshold: ${config.dataGapAnalysis.SUCCESS_RATE_THRESHOLD * 100}%`);
+```
+
+### Single Week Analysis
+
+```javascript
+// Run analysis for a specific week
+const weekResult = await runner.runWeeklyAnalysis(1);
+
+console.log(`Week ${weekResult.weekNumber} Results:`);
+console.log(`Success Rate: ${(weekResult.report.summary.overallSuccessRate * 100).toFixed(1)}%`);
+console.log(`Data Gaps: ${weekResult.report.summary.dataGapsCount}`);
+console.log(`Alerts: ${weekResult.report.summary.alertsCount}`);
+console.log(`Report: ${weekResult.reportPath}`);
+```
+
+### Multi-Week Analysis
+
+```javascript
+// Run analysis for all configured weeks
+const multiWeekResult = await runner.runMultiWeekAnalysis();
+
+if (multiWeekResult) {
+  console.log(`Multi-Week Summary:`);
+  console.log(`Total Weeks: ${multiWeekResult.summaryReport.metadata.totalWeeks}`);
+  console.log(`Average Success Rate: ${(multiWeekResult.summaryReport.overallMetrics.averageSuccessRate * 100).toFixed(1)}%`);
+  console.log(`Total Data Gaps: ${multiWeekResult.summaryReport.overallMetrics.totalDataGaps}`);
+  console.log(`Success Trend: ${multiWeekResult.summaryReport.trends.successRateTrend}`);
+  console.log(`Summary Report: ${multiWeekResult.summaryPath}`);
+}
+```
+
+### Direct WeeklyReporter Usage
+
+```javascript
+import { WeeklyReporter } from '@curl-runner/core';
+
+const reporter = new WeeklyReporter('./reports', 52);
+
+// Analyze week data
+const weekData = {
+  week: 1,
+  scripts: [
+    {
+      name: 'api-test.sh',
+      results: [
+        { success: true, output: 'Success', httpStatus: 200, duration: 150 },
+        { success: false, output: 'Error', httpStatus: 500, duration: 200 }
+      ]
+    }
+  ]
+};
+
+const analysis = reporter.analyzeDataGaps(weekData);
+console.log(`Success Rate: ${(analysis.overallSuccessRate * 100).toFixed(1)}%`);
+console.log(`Data Gaps: ${analysis.dataGaps.length}`);
+console.log(`Alerts: ${analysis.alerts.length}`);
+
+// Generate and save report
+const report = reporter.generateWeeklyReport(weekData);
+const reportPath = await reporter.saveWeeklyReport(report);
+```
+
+### Report Structure
+
+Weekly reports include:
+
+- **Metadata**: Generation timestamp, week number, version
+- **Summary**: Overall metrics and counts
+- **Analysis**: Detailed data gap analysis with severity levels
+- **Recommendations**: Actionable insights based on analysis
+- **Trends**: Performance trends over time
+
+### Data Gap Detection
+
+The library automatically detects:
+
+- **Critical Gaps**: Success rate < 50%
+- **High Priority Gaps**: Success rate < 80%
+- **Medium Gaps**: Success rate < 95%
+- **Error Rate Alerts**: Error rate > 5%
+- **Overall Performance**: System-wide issues
+
+>>>>>>> main
 ## 📚 API Reference
 
 ### CurlRunner
@@ -117,6 +233,7 @@ The main class for running cURL scripts.
 #### Constructor
 
 ```javascript
+<<<<<<< HEAD
 new CurlRunner(config?: CurlRunnerConfig)
 ```
 
@@ -127,6 +244,16 @@ new CurlRunner(config?: CurlRunnerConfig)
 - `errorLogFile` (string): Error log filename (default: 'curl-api-errors.log')
 - `scriptExtension` (string): Script file extension (default: '.sh')
 - `scriptDelayMs` (number): Delay between scripts (default: 1000)
+=======
+new CurlRunner(scriptsDir?, logsDir?, reportsDir?, weeks?)
+```
+
+**Parameters:**
+- `scriptsDir` (string, optional): Directory containing .sh files (default: './scripts')
+- `logsDir` (string, optional): Directory for log files (default: './var/logs')
+- `reportsDir` (string, optional): Directory for weekly reports (default: './var/reports')
+- `weeks` (number, optional): Number of weeks for analysis (default: 52)
+>>>>>>> main
 
 #### Methods
 
@@ -139,6 +266,49 @@ Runs a specific script by name.
 ##### `scanScripts(): Promise<ScriptInfo[]>`
 Scans the scripts directory and returns available scripts.
 
+<<<<<<< HEAD
+=======
+##### `runWeeklyAnalysis(weekNumber?: number): Promise<WeeklyAnalysisResult>`
+Runs data gap analysis for a specific week and generates a weekly report.
+
+##### `runMultiWeekAnalysis(): Promise<MultiWeekAnalysisResult>`
+Runs data gap analysis for all configured weeks and generates summary reports.
+
+##### `getWeeklyReportingConfig(): WeeklyReportingConfig`
+Returns the current weekly reporting configuration.
+
+### WeeklyReporter
+
+Handles weekly data gap analysis and report generation.
+
+#### Constructor
+
+```javascript
+new WeeklyReporter(reportsDir?, weeks?)
+```
+
+**Parameters:**
+- `reportsDir` (string, optional): Directory for reports (default: './var/reports')
+- `weeks` (number, optional): Number of weeks for analysis (default: 52)
+
+#### Methods
+
+##### `analyzeDataGaps(weekData: WeeklyReportData): DataGapAnalysis`
+Analyzes data gaps for a specific week's data.
+
+##### `generateWeeklyReport(weekData: WeeklyReportData): WeeklyReport`
+Generates a comprehensive weekly report.
+
+##### `generateSummaryReport(weeklyReports: WeeklyReport[]): SummaryReport`
+Generates a summary report for multiple weeks.
+
+##### `saveWeeklyReport(report: WeeklyReport): Promise<string>`
+Saves a weekly report to file and returns the file path.
+
+##### `saveSummaryReport(summary: SummaryReport): Promise<string>`
+Saves a summary report to file and returns the file path.
+
+>>>>>>> main
 ### Logger
 
 Handles all logging operations.
