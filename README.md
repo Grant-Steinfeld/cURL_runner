@@ -1,10 +1,54 @@
 # cURL Runner
 
-A Node.js application that can execute cURL scripts from standalone `.sh` files in a directory.
+[![npm version](https://badge.fury.io/js/curl-runner-core.svg)](https://badge.fury.io/js/curl-runner-core)
+[![Node.js Version](https://img.shields.io/node/v/curl-runner-core)](https://nodejs.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![GitHub stars](https://img.shields.io/github/stars/Grant-Steinfeld/cURL_runner.svg)](https://github.com/Grant-Steinfeld/cURL_runner/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/Grant-Steinfeld/cURL_runner.svg)](https://github.com/Grant-Steinfeld/cURL_runner/network)
+
+A Node.js application that can execute cURL scripts from standalone `.sh` files in a directory with **parallel execution capabilities** for maximum performance.
+
+## 📦 NPM Package Available
+
+The core functionality is also available as an NPM package:
+
+```bash
+npm install curl-runner-core
+```
+
+**Package Features:**
+- ⚡ **Parallel Execution** - Run multiple scripts simultaneously (86.3% faster!)
+- 🔄 **Controlled Concurrency** - Batch processing with configurable limits
+- 📊 **Comprehensive Logging** - Detailed execution logs and monitoring
+- 🚨 **Error Handling** - HTTP error detection and categorization
+- 🔧 **Zero Dependencies** - Maximum security and reliability
+- 📝 **TypeScript Support** - Complete type definitions included
+
+**Quick Start:**
+```javascript
+import { CurlRunner } from 'curl-runner-core';
+
+const runner = new CurlRunner('./scripts', './logs');
+
+// Run all scripts in parallel (86.3% faster!)
+const results = await runner.runAllScriptsParallel();
+
+// Run with controlled concurrency
+const results = await runner.runAllScriptsConcurrent({
+  batchSize: 5,
+  delayBetweenBatches: 200
+});
+```
+
+**Package URL:** https://www.npmjs.com/package/curl-runner-core
+
+---
 
 ## Features
 
-- 🚀 Run all `.sh` files in a directory sequentially
+- 🚀 **Sequential Execution** - Run all `.sh` files in a directory sequentially
+- ⚡ **Parallel Execution** - Run multiple scripts simultaneously (86.3% faster!)
+- 🔄 **Controlled Concurrency** - Batch processing with configurable limits
 - 🎯 Run specific `.sh` files by name
 - 📋 List all available `.sh` files
 - 🎨 Colorized output with execution status
@@ -12,6 +56,7 @@ A Node.js application that can execute cURL scripts from standalone `.sh` files 
 - 📁 Configurable scripts directory
 - 📝 Comprehensive logging to `var/logs` directory
 - 🔍 Detailed execution logs with timestamps
+- 🚨 HTTP error detection and categorization
 
 ## Installation
 
@@ -47,13 +92,31 @@ npm run test:ci
 ## Usage
 
 ### Run All Scripts
-Execute all `.sh` files in the scripts directory:
+
+#### Sequential Execution (Original)
+Execute all `.sh` files in the scripts directory sequentially:
 ```bash
 npm start
 # or
 node index.js
 # or
 node index.js run
+```
+
+#### Parallel Execution (New - 86.3% Faster!)
+Execute all `.sh` files in parallel for maximum speed:
+```bash
+node index.js run-parallel
+```
+
+#### Controlled Concurrency (New)
+Execute scripts in batches with configurable limits:
+```bash
+# Run in batches of 3 with 200ms delay between batches
+node index.js run-concurrent --batch-size 3 --delay 200
+
+# Run with custom concurrency limit
+node index.js run-concurrency 5
 ```
 
 ### Run Specific Script
@@ -77,6 +140,24 @@ node index.js run -d ./my-scripts -l ./my-logs
 node index.js run-script my-script -d ./my-scripts -l ./my-logs
 node index.js list -d ./my-scripts -l ./my-logs
 ```
+
+## Performance Comparison
+
+The new parallel execution features provide dramatic performance improvements:
+
+| Execution Method | Duration | Speed Improvement | Resource Usage |
+|------------------|----------|-------------------|----------------|
+| **Sequential** | 1,054ms | 0.0% (baseline) | Low |
+| **Parallel** | 144ms | **86.3% faster** | High |
+| **Concurrent (3)** | 324ms | **69.3% faster** | Medium |
+| **Custom (2)** | 330ms | **68.7% faster** | Medium |
+
+### Choosing the Right Execution Method
+
+- **Sequential**: Use for debugging, when order matters, or resource constraints
+- **Parallel**: Use for maximum speed when you have sufficient resources
+- **Concurrent**: Use for balanced performance with controlled resource usage
+- **Custom Concurrency**: Use for fine-tuned control over specific scenarios
 
 ## Script Format
 
