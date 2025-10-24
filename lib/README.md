@@ -1,7 +1,7 @@
-# @curl-runner/core
+# curl-runner-core
 
-[![npm version](https://badge.fury.io/js/%40curl-runner%2Fcore.svg)](https://badge.fury.io/js/%40curl-runner%2Fcore)
-[![Node.js Version](https://img.shields.io/node/v/@curl-runner/core)](https://nodejs.org/)
+[![npm version](https://badge.fury.io/js/curl-runner-core.svg)](https://badge.fury.io/js/curl-runner-core)
+[![Node.js Version](https://img.shields.io/node/v/curl-runner-core)](https://nodejs.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 Core library for running cURL scripts with comprehensive logging and error handling. This library provides the essential functionality for executing cURL scripts, parsing output, and managing logs without CLI dependencies.
@@ -20,7 +20,7 @@ Core library for running cURL scripts with comprehensive logging and error handl
 ## 📦 Installation
 
 ```bash
-npm install @curl-runner/core
+npm install curl-runner-core
 ```
 
 ## 📋 Requirements
@@ -46,7 +46,7 @@ The library automatically enforces Node.js version compatibility when imported:
 ### Basic Usage
 
 ```javascript
-import { CurlRunner } from '@curl-runner/core';
+import { CurlRunner } from 'curl-runner-core';
 
 // Create a new runner instance
 const runner = new CurlRunner({
@@ -78,7 +78,7 @@ console.log('Script result:', result);
 ### Individual Components
 
 ```javascript
-import { Logger, CurlParser, FileSystem } from '@curl-runner/core';
+import { Logger, CurlParser, FileSystem } from 'curl-runner-core';
 
 // Use the logger
 const logger = new Logger('./logs');
@@ -101,7 +101,7 @@ import {
   isTestedVersion, 
   isRecommendedVersion,
   getCompatibilityMatrix 
-} from '@curl-runner/core';
+} from 'curl-runner-core';
 
 // Check compatibility status
 const info = getCompatibilityInfo();
@@ -216,7 +216,7 @@ Checks if a file exists.
 ### Parallel Execution Configuration
 
 ```javascript
-import { DEFAULT_CONFIG } from '@curl-runner/core';
+import { DEFAULT_CONFIG } from 'curl-runner-core';
 
 console.log(DEFAULT_CONFIG);
 // {
@@ -285,7 +285,7 @@ npm run test:coverage
 Full TypeScript definitions are included:
 
 ```typescript
-import { CurlRunner, CurlResult, LoggerConfig } from '@curl-runner/core';
+import { CurlRunner, CurlResult, LoggerConfig } from 'curl-runner-core';
 
 const runner: CurlRunner = new CurlRunner();
 const result: CurlResult = await runner.runScript('test.sh');
