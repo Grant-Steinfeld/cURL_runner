@@ -9,10 +9,11 @@ Core library for running cURL scripts with comprehensive logging and error handl
 ## 🚀 Features
 
 - **🔄 cURL Script Execution** - Run individual or batch cURL scripts
+- **⚡ Parallel Execution** - Run multiple scripts simultaneously for maximum performance
+- **🔄 Controlled Concurrency** - Batch processing with configurable limits
 - **📊 Comprehensive Logging** - Detailed logs with timestamps and status tracking
 - **🚨 Error Handling** - HTTP error detection and categorization
 - **📁 File Management** - Script discovery and file system utilities
-- **⚡ High Performance** - Optimized for batch processing
 - **🔧 Modular Design** - Use individual components or the full suite
 - **📝 TypeScript Support** - Full type definitions included
 
@@ -53,9 +54,21 @@ const runner = new CurlRunner({
   logsDir: './logs'
 });
 
-// Run all scripts in the directory
-const results = await runner.runAllScripts();
-console.log(`Executed ${results.length} scripts`);
+// Run all scripts in parallel (unlimited concurrency)
+const parallelResults = await runner.runAllScriptsParallel();
+console.log(`Parallel execution: ${parallelResults.length} scripts`);
+
+// Run scripts with controlled concurrency (batched)
+const concurrentResults = await runner.runAllScriptsConcurrent({
+  batchSize: 5,
+  delayBetweenBatches: 200
+});
+console.log(`Concurrent execution: ${concurrentResults.length} scripts`);
+
+// Run specific scripts with custom concurrency limit
+const scripts = ['script1.sh', 'script2.sh', 'script3.sh'];
+const customResults = await runner.runScriptsWithConcurrency(scripts, 3);
+console.log(`Custom concurrency: ${customResults.length} scripts`);
 
 // Run a specific script
 const result = await runner.runScript('example-get.sh');
@@ -131,7 +144,24 @@ new CurlRunner(config?: CurlRunnerConfig)
 #### Methods
 
 ##### `runAllScripts(): Promise<CurlResult[]>`
-Runs all scripts in the scripts directory.
+Runs all scripts in the scripts directory sequentially.
+
+##### `runAllScriptsParallel(): Promise<CurlResult[]>`
+Runs all scripts in the scripts directory in parallel (unlimited concurrency).
+
+##### `runAllScriptsConcurrent(options?: ConcurrentOptions): Promise<CurlResult[]>`
+Runs all scripts with controlled concurrency using batched parallel execution.
+
+**ConcurrentOptions:**
+- `batchSize` (number): Number of scripts to run simultaneously (default: 5)
+- `delayBetweenBatches` (number): Delay between batches in milliseconds (default: 200)
+
+##### `runScriptsWithConcurrency(scripts: string[], maxConcurrent?: number): Promise<CurlResult[]>`
+Runs specific scripts with custom concurrency control.
+
+**Parameters:**
+- `scripts` (string[]): Array of script names to run
+- `maxConcurrent` (number): Maximum number of concurrent executions (default: 10)
 
 ##### `runScript(scriptName: string): Promise<CurlResult>`
 Runs a specific script by name.
@@ -183,7 +213,7 @@ Checks if a file exists.
 
 ## 🔧 Configuration
 
-### Default Configuration
+### Parallel Execution Configuration
 
 ```javascript
 import { DEFAULT_CONFIG } from '@curl-runner/core';
@@ -195,9 +225,29 @@ console.log(DEFAULT_CONFIG);
 //   REPORT_LOG_FILE: 'curl-runner-report.log',
 //   ERROR_LOG_FILE: 'curl-api-errors.log',
 //   SCRIPT_EXTENSION: '.sh',
-//   SCRIPT_DELAY_MS: 1000
+//   SCRIPT_DELAY_MS: 100,
+//   PARALLEL_ENABLED: false,
+//   PARALLEL_BATCH_SIZE: 5,
+//   PARALLEL_MAX_CONCURRENT: 10,
+//   PARALLEL_DELAY_BETWEEN_BATCHES: 200
 // }
 ```
+
+### Performance Comparison
+
+| Execution Method | Use Case | Performance | Resource Usage |
+|------------------|----------|-------------|----------------|
+| **Sequential** | Safe, reliable execution | Slowest | Lowest |
+| **Parallel** | Maximum speed | Fastest | Highest |
+| **Concurrent** | Balanced performance | Fast | Moderate |
+| **Custom Concurrency** | Fine-tuned control | Configurable | Configurable |
+
+### Choosing the Right Execution Method
+
+- **Sequential (`runAllScripts`)**: Use when you need guaranteed order, debugging, or have resource constraints
+- **Parallel (`runAllScriptsParallel`)**: Use for maximum speed when you have sufficient resources
+- **Concurrent (`runAllScriptsConcurrent`)**: Use for balanced performance with controlled resource usage
+- **Custom Concurrency (`runScriptsWithConcurrency`)**: Use when you need fine-grained control over specific scripts
 
 ## 📊 Logging
 

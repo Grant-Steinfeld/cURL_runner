@@ -17,6 +17,11 @@ export interface LoggerConfig {
   errorLogFile: string;
 }
 
+export interface ConcurrentOptions {
+  batchSize?: number;
+  delayBetweenBatches?: number;
+}
+
 export interface CurlRunnerConfig {
   scriptsDir: string;
   logsDir: string;
@@ -41,6 +46,9 @@ export interface HttpErrorInfo {
 export declare class CurlRunner {
   constructor(config?: Partial<CurlRunnerConfig>);
   runAllScripts(): Promise<CurlResult[]>;
+  runAllScriptsParallel(): Promise<CurlResult[]>;
+  runAllScriptsConcurrent(options?: ConcurrentOptions): Promise<CurlResult[]>;
+  runScriptsWithConcurrency(scripts: string[], maxConcurrent?: number): Promise<CurlResult[]>;
   runScript(scriptName: string): Promise<CurlResult>;
   scanScripts(): Promise<ScriptInfo[]>;
 }

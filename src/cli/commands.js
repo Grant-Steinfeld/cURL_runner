@@ -33,6 +33,43 @@ export function setupCommands() {
     });
 
   program
+    .command('run-parallel')
+    .description('Run all .sh files in parallel (unlimited concurrency)')
+    .option('-d, --dir <directory>', 'Scripts directory', './scripts')
+    .option('-l, --logs <directory>', 'Logs directory', './var/logs')
+    .action(async (options) => {
+      const runner = new CurlRunner(options.dir, options.logs);
+      await runner.runAllScriptsParallel();
+    });
+
+  program
+    .command('run-concurrent')
+    .description('Run all .sh files with controlled concurrency (batched parallel execution)')
+    .option('-d, --dir <directory>', 'Scripts directory', './scripts')
+    .option('-l, --logs <directory>', 'Logs directory', './var/logs')
+    .option('-b, --batch-size <size>', 'Batch size for concurrent execution', '5')
+    .option('--delay <ms>', 'Delay between batches in milliseconds', '200')
+    .action(async (options) => {
+      const runner = new CurlRunner(options.dir, options.logs);
+      const concurrentOptions = {
+        batchSize: parseInt(options.batchSize),
+        delayBetweenBatches: parseInt(options.delay)
+      };
+      await runner.runAllScriptsConcurrent(concurrentOptions);
+    });
+
+  program
+    .command('run-concurrency <max>')
+    .description('Run all .sh files with custom concurrency control')
+    .option('-d, --dir <directory>', 'Scripts directory', './scripts')
+    .option('-l, --logs <directory>', 'Logs directory', './var/logs')
+    .action(async (maxConcurrent, options) => {
+      const runner = new CurlRunner(options.dir, options.logs);
+      const scripts = runner.scanScripts();
+      await runner.runScriptsWithConcurrency(scripts, parseInt(maxConcurrent));
+    });
+
+  program
     .command('list')
     .description('List all available .sh files')
     .option('-d, --dir <directory>', 'Scripts directory', './scripts')
