@@ -72,7 +72,7 @@ Created comprehensive unit tests for each utility class:
 Instead of trying to mock everything, focus on integration tests that test the actual functionality:
 ```javascript
 // Test the actual behavior rather than mocking
-const runner = new CurlRunner('./test-scripts', './test-logs');
+const runner = new CurlRunner('./cURL_scripts', './test-logs');
 const scripts = runner.scanScripts();
 assert.ok(Array.isArray(scripts));
 ```
@@ -80,9 +80,9 @@ assert.ok(Array.isArray(scripts));
 ### 2. **Use Real Test Data**
 Create real test files and directories for testing:
 ```bash
-mkdir -p test-scripts
-echo '#!/bin/bash\necho "test"' > test-scripts/test.sh
-chmod +x test-scripts/test.sh
+mkdir -p cURL_scripts
+echo '#!/bin/bash\necho "test"' > cURL_scripts/test.sh
+chmod +x cURL_scripts/test.sh
 ```
 
 ### 3. **Test Utility Classes Individually**

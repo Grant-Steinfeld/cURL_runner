@@ -18,7 +18,7 @@ Object.defineProperty(process, 'fs', {
 });
 
 describe('FileSystem', () => {
-  const testScriptsDir = './test-scripts';
+  const testScriptsDir = './cURL_scripts';
 
   beforeEach(() => {
     mockFs.existsSync.mock.resetCalls();
@@ -65,7 +65,7 @@ describe('FileSystem', () => {
       
       assert.deepStrictEqual(scripts, []);
       assert.strictEqual(consoleSpy.mock.callCount(), 1);
-      assert.match(consoleSpy.mock.calls[0][0], /Error scanning directory: Read failed/);
+      assert.match(consoleSpy.mock.calls[0][0], /❌ Error scanning directory.*Read failed/);
       
       console.error = originalError;
     });

@@ -18,7 +18,7 @@ Object.defineProperty(process, 'fs', {
 });
 
 describe('CLI Integration Tests', () => {
-  const testScriptsDir = './test-scripts';
+  const testScriptsDir = './cURL_scripts';
   const testLogsDir = './test-logs';
 
   beforeEach(() => {

@@ -3,7 +3,7 @@
  */
 export const DEFAULT_CONFIG = {
   // Directory paths
-  SCRIPTS_DIR: './scripts',
+  SCRIPTS_DIR: './cURL_scripts',
   LOGS_DIR: './var/logs',
   
   // Log file names
@@ -18,6 +18,12 @@ export const DEFAULT_CONFIG = {
   // Execution settings
   SCRIPT_DELAY_MS: 100,
   TIMEOUT_MS: 30000,
+  
+  // Parallel execution settings
+  PARALLEL_ENABLED: false,
+  PARALLEL_BATCH_SIZE: 5,
+  PARALLEL_MAX_CONCURRENT: 10,
+  PARALLEL_DELAY_BETWEEN_BATCHES: 200,
   
   // HTTP status codes
   HTTP_SUCCESS_MIN: 200,
@@ -40,7 +46,7 @@ export const DEFAULT_CONFIG = {
       short: '-d',
       long: '--dir',
       description: 'Scripts directory',
-      default: './scripts'
+      default: './cURL_scripts'
     },
     logs: {
       short: '-l',

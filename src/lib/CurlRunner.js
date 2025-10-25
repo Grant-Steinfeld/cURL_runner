@@ -1,7 +1,6 @@
 import fs from 'fs';
 import path from 'path';
 import { exec } from 'child_process';
-import chalk from 'chalk';
 import { Logger } from '../utils/logger.js';
 import { CurlParser } from '../utils/parser.js';
 import { FileSystem } from '../utils/fileSystem.js';
@@ -72,15 +71,24 @@ export class CurlRunner {
     
     if (!FileSystem.fileExists(scriptPath)) {
       const errorMsg = `Script ${scriptName} not found in ${this.scriptsDir}`;
-      console.error(chalk.red(errorMsg));
+      console.error(`❌ ${errorMsg}`);
+      console.log(`💡 Make sure the script exists and the directory path is correct.`);
       if (logFile) {
         this.writeLog(logFile, `ERROR: ${errorMsg}`);
       }
-      return false;
+      return {
+        scriptName,
+        success: false,
+        error: errorMsg,
+        duration: 0,
+        httpStatus: null,
+        output: '',
+        stderr: ''
+      };
     }
 
-    console.log(chalk.cyan(`\n🚀 Running script: ${scriptName}`));
-    console.log(chalk.gray('─'.repeat(50)));
+    console.log(`\n🚀 Running script: ${scriptName}`);
+    console.log('─'.repeat(50));
 
     if (logFile) {
       this.writeLog(logFile, `Starting execution of script: ${scriptName}`);
@@ -94,10 +102,10 @@ export class CurlRunner {
         
         if (error) {
           const errorMsg = `Error executing ${scriptName}: ${error.message}`;
-          console.error(chalk.red(`❌ ${errorMsg}`));
-          console.error(chalk.red(error.message));
+          console.error(`❌ ${errorMsg}`);
+          console.error(error.message);
           if (stderr) {
-            console.error(chalk.red('STDERR:'), stderr);
+            console.error('STDERR:', stderr);
           }
           
           if (logFile) {
@@ -113,7 +121,15 @@ export class CurlRunner {
           // Write to API error log for execution errors
           this.writeErrorLog(scriptName, error.message, null, duration);
           
-          resolve(false);
+          resolve({
+          scriptName,
+          success: false,
+          error: errorMessage || errorMsg,
+          duration,
+          httpStatus: parsed.httpStatus,
+          output: stdout,
+          stderr: stderr
+        });
           return;
         }
 
@@ -122,7 +138,7 @@ export class CurlRunner {
         
         if (isApiError) {
           const errorMsg = `API Error: HTTP ${httpStatus}`;
-          console.error(chalk.red(`❌ ${scriptName}: ${errorMsg}`));
+          console.error(console.error(`❌ ${scriptName}: ${errorMsg}`));
           
           if (logFile) {
             this.writeLog(logFile, `API ERROR: ${errorMsg}`);
@@ -134,13 +150,21 @@ export class CurlRunner {
           // Write to dedicated API error log
           this.writeErrorLog(scriptName, errorMessage || errorMsg, httpStatus, duration);
           
-          resolve(false);
+          resolve({
+          scriptName,
+          success: false,
+          error: errorMessage || errorMsg,
+          duration,
+          httpStatus: parsed.httpStatus,
+          output: stdout,
+          stderr: stderr
+        });
           return;
         }
 
         const successMsg = `${scriptName} completed successfully in ${duration}ms`;
-        console.log(chalk.green(`✅ ${successMsg}`));
-        console.log(chalk.gray(`⏱️  Duration: ${duration}ms`));
+        console.log(`✅ ${successMsg}`);
+        console.log(`⏱️  Duration: ${duration}ms`);
         
         if (logFile) {
           this.writeLog(logFile, `SUCCESS: ${successMsg}`);
@@ -150,7 +174,7 @@ export class CurlRunner {
         this.writeReportLog(`✅ SUCCESS: ${scriptName} (${duration}ms)`);
         
         if (stdout) {
-          console.log(chalk.blue('\n📤 Output:'));
+          console.log('\n📤 Output:');
           console.log(stdout);
           
           if (logFile) {
@@ -158,7 +182,14 @@ export class CurlRunner {
           }
         }
         
-        resolve(true);
+        resolve({
+          scriptName,
+          success: true,
+          duration,
+          httpStatus: parsed.httpStatus,
+          output: stdout,
+          stderr: stderr
+        });
       });
     });
   }
@@ -170,15 +201,17 @@ export class CurlRunner {
     const scripts = this.scanScripts();
     
     if (scripts.length === 0) {
-      console.log(chalk.yellow('No .sh files found to run.'));
-      return;
+      console.log(console.log('⚠️  No .sh files found to run.'));
+      console.log(console.log(`📁 Checked directory: ${this.scriptsDir}`));
+      console.log(console.log(`💡 Add some .sh files to get started!`));
+      return [];
     }
 
     const logFile = this.generateLogFilename();
-    console.log(chalk.blue(`\n🎯 Running ${scripts.length} script(s)...`));
-    console.log(chalk.gray(`📝 Logging to: ${logFile}`));
-    console.log(chalk.gray(`📊 Report log: ${DEFAULT_CONFIG.REPORT_LOG_FILE}`));
-    console.log(chalk.gray(`🚨 Error log: ${DEFAULT_CONFIG.ERROR_LOG_FILE}`));
+    console.log(`\n🎯 Running ${scripts.length} script(s)...`);
+    console.log(`📝 Logging to: ${logFile}`);
+    console.log(`📊 Report log: ${DEFAULT_CONFIG.REPORT_LOG_FILE}`);
+    console.log(`🚨 Error log: ${DEFAULT_CONFIG.ERROR_LOG_FILE}`);
     
     this.writeLog(logFile, `Starting batch execution of ${scripts.length} scripts`);
     this.writeLog(logFile, `Scripts to run: ${scripts.join(', ')}`);
@@ -200,14 +233,14 @@ export class CurlRunner {
     }
 
     const summaryMsg = `Batch execution completed: ${successCount} successful, ${failureCount} failed, ${scripts.length} total`;
-    console.log(chalk.gray('\n' + '─'.repeat(50)));
-    console.log(chalk.blue(`📊 Summary:`));
-    console.log(chalk.green(`  ✅ Successful: ${successCount}`));
-    console.log(chalk.red(`  ❌ Failed: ${failureCount}`));
-    console.log(chalk.blue(`  📁 Total: ${scripts.length}`));
-    console.log(chalk.gray(`📝 Log saved to: ${logFile}`));
-    console.log(chalk.gray(`📊 Report log: ${DEFAULT_CONFIG.REPORT_LOG_FILE}`));
-    console.log(chalk.gray(`🚨 Error log: ${DEFAULT_CONFIG.ERROR_LOG_FILE}`));
+    console.log(console.log('\n' + '─'.repeat(50)));
+    console.log(console.log(`📊 Summary:`));
+    console.log(console.log(`  ✅ Successful: ${successCount}`));
+    console.log(console.error(`  ❌ Failed: ${failureCount}`));
+    console.log(console.log(`  📁 Total: ${scripts.length}`));
+    console.log(console.log(`📝 Log saved to: ${logFile}`));
+    console.log(console.log(`📊 Report log: ${DEFAULT_CONFIG.REPORT_LOG_FILE}`));
+    console.log(console.log(`🚨 Error log: ${DEFAULT_CONFIG.ERROR_LOG_FILE}`));
     
     this.writeLog(logFile, summaryMsg);
     this.writeReportLog(`🏁 BATCH COMPLETE: ${successCount}/${scripts.length} successful (${failureCount} failed)`);
@@ -222,21 +255,219 @@ export class CurlRunner {
     }
     
     const logFile = this.generateLogFilename(scriptName);
-    console.log(chalk.gray(`📝 Logging to: ${logFile}`));
-    console.log(chalk.gray(`📊 Report log: ${DEFAULT_CONFIG.REPORT_LOG_FILE}`));
-    console.log(chalk.gray(`🚨 Error log: ${DEFAULT_CONFIG.ERROR_LOG_FILE}`));
+    console.log(console.log(`📝 Logging to: ${logFile}`));
+    console.log(console.log(`📊 Report log: ${DEFAULT_CONFIG.REPORT_LOG_FILE}`));
+    console.log(console.log(`🚨 Error log: ${DEFAULT_CONFIG.ERROR_LOG_FILE}`));
     
     this.writeReportLog(`🎯 SINGLE SCRIPT: Starting ${scriptName}`);
     
     const success = await this.runScript(scriptName, logFile);
     
     if (success) {
-      console.log(chalk.gray(`📝 Log saved to: ${logFile}`));
-      console.log(chalk.gray(`📊 Report log: ${DEFAULT_CONFIG.REPORT_LOG_FILE}`));
-      console.log(chalk.gray(`🚨 Error log: ${DEFAULT_CONFIG.ERROR_LOG_FILE}`));
+      console.log(console.log(`📝 Log saved to: ${logFile}`));
+      console.log(console.log(`📊 Report log: ${DEFAULT_CONFIG.REPORT_LOG_FILE}`));
+      console.log(console.log(`🚨 Error log: ${DEFAULT_CONFIG.ERROR_LOG_FILE}`));
     }
     
     return success;
+  }
+
+  /**
+   * Run all scripts in parallel (unlimited concurrency)
+   */
+  async runAllScriptsParallel() {
+    const scripts = this.scanScripts();
+    
+    if (scripts.length === 0) {
+      console.log(console.log('⚠️  No .sh files found to run.'));
+      console.log(console.log(`📁 Checked directory: ${this.scriptsDir}`));
+      console.log(console.log(`💡 Add some .sh files to get started!`));
+      return [];
+    }
+
+    const logFile = this.generateLogFilename();
+    console.log(console.log(`\n🚀 Running ${scripts.length} script(s) in parallel...`));
+    console.log(console.log(`📝 Logging to: ${logFile}`));
+    console.log(console.log(`📊 Report log: ${DEFAULT_CONFIG.REPORT_LOG_FILE}`));
+    console.log(console.log(`🚨 Error log: ${DEFAULT_CONFIG.ERROR_LOG_FILE}`));
+    
+    this.writeLog(logFile, `Starting parallel execution of ${scripts.length} scripts`);
+    this.writeLog(logFile, `Scripts to run: ${scripts.join(', ')}`);
+    this.writeReportLog(`🚀 PARALLEL START: Running ${scripts.length} scripts`);
+    
+    const startTime = Date.now();
+    
+    // Run all scripts in parallel
+    const results = await Promise.all(
+      scripts.map(script => this.runScript(script, logFile))
+    );
+    
+    const totalDuration = Date.now() - startTime;
+    const successCount = results.filter(r => r.success).length;
+    const failureCount = results.filter(r => !r.success).length;
+    
+    const summaryMsg = `Parallel execution completed: ${successCount} successful, ${failureCount} failed, ${scripts.length} total in ${totalDuration}ms`;
+    console.log(console.log('\n' + '─'.repeat(50)));
+    console.log(console.log(`📊 Parallel Summary:`));
+    console.log(console.log(`  ✅ Successful: ${successCount}`));
+    console.log(console.error(`  ❌ Failed: ${failureCount}`));
+    console.log(console.log(`  📁 Total: ${scripts.length}`));
+    console.log(console.log(`  ⏱️ Duration: ${totalDuration}ms`));
+    console.log(console.log(`📝 Log saved to: ${logFile}`));
+    console.log(console.log(`📊 Report log: ${DEFAULT_CONFIG.REPORT_LOG_FILE}`));
+    console.log(console.log(`🚨 Error log: ${DEFAULT_CONFIG.ERROR_LOG_FILE}`));
+    
+    this.writeLog(logFile, summaryMsg);
+    this.writeReportLog(`🏁 PARALLEL COMPLETE: ${successCount}/${scripts.length} successful (${failureCount} failed) in ${totalDuration}ms`);
+    
+    return results;
+  }
+
+  /**
+   * Run all scripts with controlled concurrency (batched parallel execution)
+   */
+  async runAllScriptsConcurrent(options = {}) {
+    const scripts = this.scanScripts();
+    
+    if (scripts.length === 0) {
+      console.log(console.log('⚠️  No .sh files found to run.'));
+      console.log(console.log(`📁 Checked directory: ${this.scriptsDir}`));
+      console.log(console.log(`💡 Add some .sh files to get started!`));
+      return [];
+    }
+
+    const batchSize = options.batchSize || DEFAULT_CONFIG.PARALLEL_BATCH_SIZE;
+    const delayBetweenBatches = options.delayBetweenBatches || DEFAULT_CONFIG.PARALLEL_DELAY_BETWEEN_BATCHES;
+    
+    const logFile = this.generateLogFilename();
+    console.log(console.log(`\n🔄 Running ${scripts.length} script(s) in batches of ${batchSize}...`));
+    console.log(console.log(`📝 Logging to: ${logFile}`));
+    console.log(console.log(`📊 Report log: ${DEFAULT_CONFIG.REPORT_LOG_FILE}`));
+    console.log(console.log(`🚨 Error log: ${DEFAULT_CONFIG.ERROR_LOG_FILE}`));
+    
+    this.writeLog(logFile, `Starting concurrent execution of ${scripts.length} scripts in batches of ${batchSize}`);
+    this.writeLog(logFile, `Scripts to run: ${scripts.join(', ')}`);
+    this.writeReportLog(`🚀 CONCURRENT START: Running ${scripts.length} scripts in batches of ${batchSize}`);
+    
+    const startTime = Date.now();
+    const results = [];
+    let successCount = 0;
+    let failureCount = 0;
+
+    // Process scripts in batches
+    for (let i = 0; i < scripts.length; i += batchSize) {
+      const batch = scripts.slice(i, i + batchSize);
+      const batchNumber = Math.floor(i / batchSize) + 1;
+      const totalBatches = Math.ceil(scripts.length / batchSize);
+      
+      console.log(console.log(`\n📦 Batch ${batchNumber}/${totalBatches}: Running ${batch.length} scripts...`));
+      this.writeLog(logFile, `Starting batch ${batchNumber}/${totalBatches} with scripts: ${batch.join(', ')}`);
+      
+      const batchStartTime = Date.now();
+      const batchResults = await Promise.all(
+        batch.map(script => this.runScript(script, logFile))
+      );
+      const batchDuration = Date.now() - batchStartTime;
+      
+      results.push(...batchResults);
+      
+      const batchSuccessCount = batchResults.filter(r => r.success).length;
+      const batchFailureCount = batchResults.filter(r => !r.success).length;
+      successCount += batchSuccessCount;
+      failureCount += batchFailureCount;
+      
+      console.log(console.log(`✅ Batch ${batchNumber} complete: ${batchSuccessCount} successful, ${batchFailureCount} failed in ${batchDuration}ms`));
+      this.writeLog(logFile, `Batch ${batchNumber} completed: ${batchSuccessCount} successful, ${batchFailureCount} failed in ${batchDuration}ms`);
+      
+      // Add delay between batches (except for the last batch)
+      if (i + batchSize < scripts.length && delayBetweenBatches > 0) {
+        console.log(console.log(`⏳ Waiting ${delayBetweenBatches}ms before next batch...`));
+        await new Promise(resolve => setTimeout(resolve, delayBetweenBatches));
+      }
+    }
+    
+    const totalDuration = Date.now() - startTime;
+    const summaryMsg = `Concurrent execution completed: ${successCount} successful, ${failureCount} failed, ${scripts.length} total in ${totalDuration}ms`;
+    console.log(console.log('\n' + '─'.repeat(50)));
+    console.log(console.log(`📊 Concurrent Summary:`));
+    console.log(console.log(`  ✅ Successful: ${successCount}`));
+    console.log(console.error(`  ❌ Failed: ${failureCount}`));
+    console.log(console.log(`  📁 Total: ${scripts.length}`));
+    console.log(console.log(`  ⏱️ Duration: ${totalDuration}ms`));
+    console.log(console.log(`  📦 Batches: ${Math.ceil(scripts.length / batchSize)}`));
+    console.log(console.log(`📝 Log saved to: ${logFile}`));
+    console.log(console.log(`📊 Report log: ${DEFAULT_CONFIG.REPORT_LOG_FILE}`));
+    console.log(console.log(`🚨 Error log: ${DEFAULT_CONFIG.ERROR_LOG_FILE}`));
+    
+    this.writeLog(logFile, summaryMsg);
+    this.writeReportLog(`🏁 CONCURRENT COMPLETE: ${successCount}/${scripts.length} successful (${failureCount} failed) in ${totalDuration}ms across ${Math.ceil(scripts.length / batchSize)} batches`);
+    
+    return results;
+  }
+
+  /**
+   * Run scripts with custom concurrency control
+   */
+  async runScriptsWithConcurrency(scripts, maxConcurrent = DEFAULT_CONFIG.PARALLEL_MAX_CONCURRENT) {
+    if (!Array.isArray(scripts)) {
+      throw new Error('Scripts must be an array');
+    }
+    
+    if (scripts.length === 0) {
+      console.log(console.log('No scripts provided to run.'));
+      return [];
+    }
+
+    const logFile = this.generateLogFilename();
+    console.log(console.log(`\n⚡ Running ${scripts.length} script(s) with max ${maxConcurrent} concurrent...`));
+    console.log(console.log(`📝 Logging to: ${logFile}`));
+    
+    this.writeLog(logFile, `Starting concurrency-controlled execution of ${scripts.length} scripts (max ${maxConcurrent} concurrent)`);
+    this.writeLog(logFile, `Scripts to run: ${scripts.join(', ')}`);
+    this.writeReportLog(`🚀 CONCURRENCY START: Running ${scripts.length} scripts (max ${maxConcurrent} concurrent)`);
+    
+    const startTime = Date.now();
+    const results = [];
+    
+    // Process scripts with concurrency control
+    for (let i = 0; i < scripts.length; i += maxConcurrent) {
+      const batch = scripts.slice(i, i + maxConcurrent);
+      const batchNumber = Math.floor(i / maxConcurrent) + 1;
+      const totalBatches = Math.ceil(scripts.length / maxConcurrent);
+      
+      console.log(console.log(`\n⚡ Concurrent Batch ${batchNumber}/${totalBatches}: Running ${batch.length} scripts...`));
+      this.writeLog(logFile, `Starting concurrent batch ${batchNumber}/${totalBatches} with scripts: ${batch.join(', ')}`);
+      
+      const batchResults = await Promise.all(
+        batch.map(script => this.runScript(script, logFile))
+      );
+      
+      results.push(...batchResults);
+      
+      const batchSuccessCount = batchResults.filter(r => r.success).length;
+      const batchFailureCount = batchResults.filter(r => !r.success).length;
+      
+      console.log(console.log(`✅ Batch ${batchNumber} complete: ${batchSuccessCount} successful, ${batchFailureCount} failed`));
+      this.writeLog(logFile, `Concurrent batch ${batchNumber} completed: ${batchSuccessCount} successful, ${batchFailureCount} failed`);
+    }
+    
+    const totalDuration = Date.now() - startTime;
+    const successCount = results.filter(r => r.success).length;
+    const failureCount = results.filter(r => !r.success).length;
+    
+    const summaryMsg = `Concurrency-controlled execution completed: ${successCount} successful, ${failureCount} failed, ${scripts.length} total in ${totalDuration}ms`;
+    console.log(console.log('\n' + '─'.repeat(50)));
+    console.log(console.log(`📊 Concurrency Summary:`));
+    console.log(console.log(`  ✅ Successful: ${successCount}`));
+    console.log(console.error(`  ❌ Failed: ${failureCount}`));
+    console.log(console.log(`  📁 Total: ${scripts.length}`));
+    console.log(console.log(`  ⏱️ Duration: ${totalDuration}ms`));
+    console.log(console.log(`  ⚡ Max Concurrent: ${maxConcurrent}`));
+    
+    this.writeLog(logFile, summaryMsg);
+    this.writeReportLog(`🏁 CONCURRENCY COMPLETE: ${successCount}/${scripts.length} successful (${failureCount} failed) in ${totalDuration}ms`);
+    
+    return results;
   }
 
   /**

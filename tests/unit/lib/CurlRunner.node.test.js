@@ -31,7 +31,7 @@ const { CurlRunner } = await import('../../../src/lib/CurlRunner.js');
 
 describe('CurlRunner', () => {
   let curlRunner;
-  const testScriptsDir = './test-scripts';
+  const testScriptsDir = './cURL_scripts';
   const testLogsDir = './test-logs';
 
   beforeEach(() => {

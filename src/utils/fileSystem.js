@@ -1,6 +1,5 @@
 import fs from 'fs';
 import path from 'path';
-import chalk from 'chalk';
 
 /**
  * Utility functions for file system operations
@@ -12,22 +11,39 @@ export class FileSystem {
   static scanScripts(scriptsDir) {
     try {
       if (!fs.existsSync(scriptsDir)) {
-        console.log(chalk.yellow(`Directory ${scriptsDir} does not exist. Creating it...`));
-        fs.mkdirSync(scriptsDir, { recursive: true });
+        console.log(console.log(`Directory ${scriptsDir} does not exist. Creating it...`));
+        try {
+          fs.mkdirSync(scriptsDir, { recursive: true });
+          console.log(console.log(`✅ Created directory: ${scriptsDir}`));
+        } catch (mkdirError) {
+          console.error(console.error(`❌ Failed to create directory ${scriptsDir}: ${mkdirError.message}`));
+          console.log(console.log(`Please create the directory manually or check permissions.`));
+          return [];
+        }
         return [];
       }
 
       const files = fs.readdirSync(scriptsDir);
       const shFiles = files.filter(file => file.endsWith('.sh'));
       
-      console.log(chalk.blue(`Found ${shFiles.length} .sh files in ${scriptsDir}:`));
-      shFiles.forEach((file, index) => {
-        console.log(chalk.gray(`  ${index + 1}. ${file}`));
-      });
+      if (shFiles.length === 0) {
+        console.log(console.log(`No .sh files found in ${scriptsDir}`));
+        console.log(console.log(`Add some .sh files to get started!`));
+      } else {
+        console.log(console.log(`Found ${shFiles.length} .sh files in ${scriptsDir}:`));
+        shFiles.forEach((file, index) => {
+          console.log(console.log(`  ${index + 1}. ${file}`));
+        });
+      }
       
       return shFiles;
     } catch (error) {
-      console.error(chalk.red(`Error scanning directory: ${error.message}`));
+      console.error(console.error(`❌ Error scanning directory ${scriptsDir}: ${error.message}`));
+      if (error.code === 'EACCES') {
+        console.log(console.log(`Permission denied. Please check directory permissions.`));
+      } else if (error.code === 'ENOENT') {
+        console.log(console.log(`Directory not found. Please create ${scriptsDir} manually.`));
+      }
       return [];
     }
   }
