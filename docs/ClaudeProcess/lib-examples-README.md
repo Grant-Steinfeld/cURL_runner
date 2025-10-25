@@ -399,4 +399,4 @@ const migrationHelper = new MigrationHelper('./scripts', './migration-logs');
 await migrationHelper.migrateToParallel();
 ```
 
-These examples demonstrate the full power and flexibility of the @curl-runner/core library with its new parallel execution capabilities!
+These examples demonstrate the full power and flexibility of the curl-runner-core library with its new parallel execution capabilities!
