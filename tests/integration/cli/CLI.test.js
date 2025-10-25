@@ -48,7 +48,7 @@ describe('CLI Integration Tests', () => {
       await new Promise((resolve, reject) => {
         child.on('close', (code) => {
           if (code === 0) {
-            assert.match(output, /Found \d+ \.sh files/);
+            assert.match(output, /Available scripts:/);
             assert.match(output, /test-script\.sh/);
             assert.match(output, /another-script\.sh/);
             resolve();
@@ -92,7 +92,7 @@ describe('CLI Integration Tests', () => {
       await new Promise((resolve, reject) => {
         child.on('close', (code) => {
           if (code === 0) {
-            assert.match(output, /Running script: test-script\.sh/);
+            assert.match(output, /🚀 Running script: test-script/);
             resolve();
           } else {
             reject(new Error(`Process exited with code ${code}`));
@@ -117,7 +117,7 @@ describe('CLI Integration Tests', () => {
       await new Promise((resolve, reject) => {
         child.on('close', (code) => {
           if (code === 0) {
-            assert.match(output, /Script nonexistent\.sh not found/);
+            assert.match(output, /❌ Script nonexistent not found/);
             resolve();
           } else {
             reject(new Error(`Process exited with code ${code}`));
@@ -142,9 +142,9 @@ describe('CLI Integration Tests', () => {
       await new Promise((resolve, reject) => {
         child.on('close', (code) => {
           if (code === 0) {
-            assert.match(output, /Running \d+ script\(s\)/);
-            assert.match(output, /Summary:/);
-            assert.match(output, /Successful:/);
+            assert.match(output, /🎯 Running \d+ script\(s\)/);
+            assert.match(output, /📊 SUMMARY/);
+            assert.match(output, /✅ SUCCESS:/);
             resolve();
           } else {
             reject(new Error(`Process exited with code ${code}`));
