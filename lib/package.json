@@ -1,6 +1,6 @@
 {
   "name": "curl-runner-core",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Core library for running cURL scripts with comprehensive logging, error handling, and parallel execution capabilities. Zero external dependencies for maximum security.",
   "type": "module",
   "main": "dist/index.js",

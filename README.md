@@ -321,3 +321,23 @@ Additional documentation is available in the [`docs/`](docs/) directory:
 ## License
 
 MIT
+
+## Development & AI-Assisted Creation
+
+This application was created with the assistance of **Cursor** and its underlying **Claude Sonnet 4** LLM. The development process leveraged AI-assisted coding to implement:
+
+- ⚡ **Parallel execution algorithms** with Promise.all() and controlled concurrency
+- 🔧 **Complex configuration management** for batch processing and delays
+- 📊 **Comprehensive logging systems** with timestamp tracking and error categorization
+- 🧪 **Extensive test suites** covering parallel execution scenarios
+- 📝 **Complete TypeScript definitions** for all new methods
+- 🚀 **NPM package optimization** with zero dependencies and proper build configuration
+
+The AI assistance was particularly valuable for:
+- Implementing efficient parallel execution patterns
+- Creating comprehensive error handling and logging
+- Generating extensive documentation and examples
+- Optimizing package configuration for npm publishing
+- Writing thorough test coverage for edge cases
+
+This demonstrates the power of AI-assisted development in creating production-ready, well-documented, and thoroughly tested applications.
