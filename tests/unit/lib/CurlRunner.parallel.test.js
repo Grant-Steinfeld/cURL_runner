@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach } from 'node:test';
-import { CurlRunner } from '../../../lib/src/core/CurlRunner.js';
-import { FileSystem } from '../../../lib/src/utils/fileSystem.js';
+import { CurlRunner } from '../../../src/lib/CurlRunner.js';
+import { FileSystem } from '../../../src/utils/fileSystem.js';
 import fs from 'fs';
 import path from 'path';
 
