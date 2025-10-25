@@ -6,7 +6,9 @@
 [![GitHub stars](https://img.shields.io/github/stars/Grant-Steinfeld/cURL_runner.svg)](https://github.com/Grant-Steinfeld/cURL_runner/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/Grant-Steinfeld/cURL_runner.svg)](https://github.com/Grant-Steinfeld/cURL_runner/network)
 
-A Node.js application that can execute cURL scripts from standalone `.sh` files in a directory with **parallel execution capabilities** for maximum performance.
+A Node.js application c that can execute cURL scripts from standalone `.sh` files in a directory with **parallel execution capabilities** for maximum performance.
+
+> Note: this was 99% created using Cursor with the Claude Sonnet 4 LLM
 
 ## 📦 NPM Package Available
 
