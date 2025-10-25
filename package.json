@@ -23,10 +23,7 @@
   ],
   "author": "",
   "license": "MIT",
-  "dependencies": {
-    "chalk": "^5.3.0",
-    "commander": "^11.1.0"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@jest/globals": "^30.2.0",
     "c8": "^10.1.3",

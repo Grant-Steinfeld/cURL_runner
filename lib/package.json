@@ -34,7 +34,15 @@
     "parallel-execution",
     "concurrency",
     "performance",
-    "batch-processing"
+    "batch-processing",
+    "data-gap-analysis",
+    "weekly-reporting",
+    "trend-analysis",
+    "monitoring",
+    "cli",
+    "nodejs",
+    "es-modules",
+    "typescript"
   ],
   "author": "Grant Steinfeld",
   "license": "MIT",
@@ -66,5 +74,12 @@
   "bugs": {
     "url": "https://github.com/Grant-Steinfeld/cURL_runner/issues"
   },
-  "homepage": "https://github.com/Grant-Steinfeld/cURL_runner#readme"
+  "homepage": "https://www.npmjs.com/package/curl-runner-core",
+  "funding": {
+    "type": "github",
+    "url": "https://github.com/sponsors/Grant-Steinfeld"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
 }

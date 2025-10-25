@@ -1,6 +1,5 @@
 import fs from 'fs';
 import path from 'path';
-import chalk from 'chalk';
 
 /**
  * Utility functions for logging operations
@@ -19,12 +18,12 @@ export class Logger {
     try {
       if (!fs.existsSync(this.logsDir)) {
         fs.mkdirSync(this.logsDir, { recursive: true });
-        console.log(chalk.green(`✅ Created logs directory: ${this.logsDir}`));
+        console.log(console.log(`✅ Created logs directory: ${this.logsDir}`));
       }
     } catch (error) {
-      console.error(chalk.red(`❌ Failed to create logs directory ${this.logsDir}: ${error.message}`));
+      console.error(console.error(`❌ Failed to create logs directory ${this.logsDir}: ${error.message}`));
       if (error.code === 'EACCES') {
-        console.log(chalk.yellow(`Permission denied. Please check directory permissions.`));
+        console.log(console.log(`Permission denied. Please check directory permissions.`));
       }
       throw error;
     }
@@ -53,16 +52,16 @@ export class Logger {
     try {
       fs.appendFileSync(logPath, logEntry);
     } catch (error) {
-      console.error(chalk.red(`❌ Error writing to log file ${logFile}: ${error.message}`));
+      console.error(console.error(`❌ Error writing to log file ${logFile}: ${error.message}`));
       if (error.code === 'EACCES') {
-        console.log(chalk.yellow(`Permission denied. Please check file permissions.`));
+        console.log(console.log(`Permission denied. Please check file permissions.`));
       } else if (error.code === 'ENOENT') {
-        console.log(chalk.yellow(`Log directory not found. Attempting to create...`));
+        console.log(console.log(`Log directory not found. Attempting to create...`));
         try {
           this.ensureLogsDirectory();
           fs.appendFileSync(logPath, logEntry);
         } catch (retryError) {
-          console.error(chalk.red(`❌ Failed to create log directory: ${retryError.message}`));
+          console.error(console.error(`❌ Failed to create log directory: ${retryError.message}`));
         }
       }
     }
@@ -79,16 +78,16 @@ export class Logger {
     try {
       fs.appendFileSync(reportPath, reportEntry);
     } catch (error) {
-      console.error(chalk.red(`❌ Error writing to report log: ${error.message}`));
+      console.error(console.error(`❌ Error writing to report log: ${error.message}`));
       if (error.code === 'EACCES') {
-        console.log(chalk.yellow(`Permission denied. Please check file permissions.`));
+        console.log(console.log(`Permission denied. Please check file permissions.`));
       } else if (error.code === 'ENOENT') {
-        console.log(chalk.yellow(`Log directory not found. Attempting to create...`));
+        console.log(console.log(`Log directory not found. Attempting to create...`));
         try {
           this.ensureLogsDirectory();
           fs.appendFileSync(reportPath, reportEntry);
         } catch (retryError) {
-          console.error(chalk.red(`❌ Failed to create log directory: ${retryError.message}`));
+          console.error(console.error(`❌ Failed to create log directory: ${retryError.message}`));
         }
       }
     }
@@ -115,16 +114,16 @@ export class Logger {
     try {
       fs.appendFileSync(errorPath, errorEntry);
     } catch (error) {
-      console.error(chalk.red(`❌ Error writing to error log: ${error.message}`));
+      console.error(console.error(`❌ Error writing to error log: ${error.message}`));
       if (error.code === 'EACCES') {
-        console.log(chalk.yellow(`Permission denied. Please check file permissions.`));
+        console.log(console.log(`Permission denied. Please check file permissions.`));
       } else if (error.code === 'ENOENT') {
-        console.log(chalk.yellow(`Log directory not found. Attempting to create...`));
+        console.log(console.log(`Log directory not found. Attempting to create...`));
         try {
           this.ensureLogsDirectory();
           fs.appendFileSync(errorPath, errorEntry);
         } catch (retryError) {
-          console.error(chalk.red(`❌ Failed to create log directory: ${retryError.message}`));
+          console.error(console.error(`❌ Failed to create log directory: ${retryError.message}`));
         }
       }
     }
