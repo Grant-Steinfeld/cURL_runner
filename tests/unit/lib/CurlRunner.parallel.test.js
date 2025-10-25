@@ -11,7 +11,7 @@ describe('CurlRunner Parallel Execution', () => {
 
   beforeEach(async () => {
     // Create temporary directories for testing
-    testScriptsDir = path.join(process.cwd(), 'test-scripts-parallel');
+    testScriptsDir = path.join(process.cwd(), 'cURL_scripts-parallel');
     testLogsDir = path.join(process.cwd(), 'test-logs-parallel');
     
     // Ensure directories exist

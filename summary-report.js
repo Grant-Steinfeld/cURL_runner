@@ -13,7 +13,7 @@ async function generateParallelSummaryReport() {
   console.log('🚀 cURL Runner Parallel Execution Summary Report');
   console.log('═'.repeat(60));
   
-  const runner = new CurlRunner('./test-scripts', './summary-logs');
+  const runner = new CurlRunner('./cURL_scripts', './summary-logs');
   
   try {
     // Get available scripts
@@ -24,7 +24,7 @@ async function generateParallelSummaryReport() {
     });
     
     if (scripts.length === 0) {
-      console.log('⚠️  No scripts found. Please add some .sh files to ./test-scripts/');
+      console.log('⚠️  No scripts found. Please add some .sh files to ./cURL_scripts/');
       return;
     }
 

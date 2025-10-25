@@ -46,7 +46,7 @@ console.log(`Custom concurrency: ${customResults.length} scripts`);
 import { CurlRunner } from 'curl-runner-core';
 
 async function performanceComparison() {
-  const runner = new CurlRunner('./test-scripts', './performance-logs');
+  const runner = new CurlRunner('./cURL_scripts', './performance-logs');
   
   // Sequential execution (baseline)
   console.log('🔄 Running sequential execution...');
@@ -334,7 +334,7 @@ class LoadTester {
 }
 
 // Usage
-const loadTester = new LoadTester('./load-test-scripts', './load-test-logs');
+const loadTester = new LoadTester('./load-cURL_scripts', './load-test-logs');
 const results = await loadTester.runLoadTest(20, 10);
 console.log('📈 Load Test Results:', results);
 ```

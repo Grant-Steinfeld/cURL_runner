@@ -29,7 +29,7 @@ Object.defineProperty(process, 'fs', {
 
 describe('CurlRunner', () => {
   let curlRunner;
-  const testScriptsDir = './test-scripts';
+  const testScriptsDir = './cURL_scripts';
   const testLogsDir = './test-logs';
 
   beforeEach(() => {
@@ -52,7 +52,7 @@ describe('CurlRunner', () => {
   describe('Constructor', () => {
     it('should initialize with default directories', () => {
       const defaultRunner = new CurlRunner();
-      assert.strictEqual(defaultRunner.scriptsDir, './scripts');
+      assert.strictEqual(defaultRunner.scriptsDir, './cURL_scripts');
       assert.strictEqual(defaultRunner.logsDir, './var/logs');
       assert.ok(defaultRunner.logger);
       assert.strictEqual(defaultRunner.logger.reportLogFile, 'curl-runner-report.log');
@@ -113,7 +113,7 @@ describe('CurlRunner', () => {
       curlRunner.writeLog('test.log', 'Test entry');
       
       assert.strictEqual(consoleSpy.mock.callCount(), 1);
-      assert.match(consoleSpy.mock.calls[0][0], /Error writing to log file: Write failed/);
+      assert.match(consoleSpy.mock.calls[0][0], /❌ Error writing to log file.*Write failed/);
       
       console.error = originalError;
     });
@@ -251,12 +251,16 @@ describe('CurlRunner', () => {
   });
 
   describe('runScript', () => {
-    it('should return false if script does not exist', async () => {
+    it('should return error object if script does not exist', async () => {
       mockFs.existsSync.mock.mockImplementation(() => false);
       
       const result = await curlRunner.runScript('nonexistent.sh');
       
-      assert.strictEqual(result, false);
+      assert.strictEqual(result.success, false);
+      assert.strictEqual(result.scriptName, 'nonexistent.sh');
+      assert.match(result.error, /Script nonexistent\.sh not found/);
+      assert.strictEqual(result.duration, 0);
+      assert.strictEqual(result.httpStatus, null);
     });
 
     it('should execute script successfully', async () => {
@@ -267,7 +271,10 @@ describe('CurlRunner', () => {
       
       const result = await curlRunner.runScript('test-script.sh');
       
-      assert.strictEqual(result, true);
+      assert.strictEqual(result.success, true);
+      assert.strictEqual(result.scriptName, 'test-script.sh');
+      assert.strictEqual(result.httpStatus, 200);
+      assert.strictEqual(result.output, mockStdout);
       assert.strictEqual(mockExec.mock.callCount(), 1);
     });
 
@@ -279,7 +286,9 @@ describe('CurlRunner', () => {
       
       const result = await curlRunner.runScript('error-script.sh');
       
-      assert.strictEqual(result, false);
+      assert.strictEqual(result.success, false);
+      assert.strictEqual(result.scriptName, 'error-script.sh');
+      assert.match(result.error, /Script failed/);
     });
 
     it('should handle API errors (HTTP 4xx/5xx)', async () => {
@@ -290,7 +299,9 @@ describe('CurlRunner', () => {
       
       const result = await curlRunner.runScript('test-script.sh');
       
-      assert.strictEqual(result, false);
+      assert.strictEqual(result.success, false);
+      assert.strictEqual(result.scriptName, 'test-script.sh');
+      assert.strictEqual(result.httpStatus, 404);
     });
   });
 

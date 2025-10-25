@@ -55,7 +55,7 @@ const results = await runner.runAllScriptsConcurrent({
 - 📋 List all available `.sh` files
 - 🎨 Colorized output with execution status
 - ⏱️ Execution timing and summary statistics
-- 📁 Configurable scripts directory
+- 📁 Configurable scripts directory (default: `./cURL_scripts`)
 - 📝 Comprehensive logging to `var/logs` directory
 - 🔍 Detailed execution logs with timestamps
 - 🚨 HTTP error detection and categorization
@@ -96,7 +96,7 @@ npm run test:ci
 ### Run All Scripts
 
 #### Sequential Execution (Original)
-Execute all `.sh` files in the scripts directory sequentially:
+Execute all `.sh` files in the cURL_scripts directory sequentially:
 ```bash
 npm start
 # or
@@ -106,7 +106,7 @@ node index.js run
 ```
 
 #### Parallel Execution (New - 86.3% Faster!)
-Execute all `.sh` files in parallel for maximum speed:
+Execute all `.sh` files in the cURL_scripts directory in parallel for maximum speed:
 ```bash
 node index.js run-parallel
 ```

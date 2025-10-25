@@ -13,21 +13,38 @@ export class FileSystem {
     try {
       if (!fs.existsSync(scriptsDir)) {
         console.log(chalk.yellow(`Directory ${scriptsDir} does not exist. Creating it...`));
-        fs.mkdirSync(scriptsDir, { recursive: true });
+        try {
+          fs.mkdirSync(scriptsDir, { recursive: true });
+          console.log(chalk.green(`✅ Created directory: ${scriptsDir}`));
+        } catch (mkdirError) {
+          console.error(chalk.red(`❌ Failed to create directory ${scriptsDir}: ${mkdirError.message}`));
+          console.log(chalk.yellow(`Please create the directory manually or check permissions.`));
+          return [];
+        }
         return [];
       }
 
       const files = fs.readdirSync(scriptsDir);
       const shFiles = files.filter(file => file.endsWith('.sh'));
       
-      console.log(chalk.blue(`Found ${shFiles.length} .sh files in ${scriptsDir}:`));
-      shFiles.forEach((file, index) => {
-        console.log(chalk.gray(`  ${index + 1}. ${file}`));
-      });
+      if (shFiles.length === 0) {
+        console.log(chalk.yellow(`No .sh files found in ${scriptsDir}`));
+        console.log(chalk.gray(`Add some .sh files to get started!`));
+      } else {
+        console.log(chalk.blue(`Found ${shFiles.length} .sh files in ${scriptsDir}:`));
+        shFiles.forEach((file, index) => {
+          console.log(chalk.gray(`  ${index + 1}. ${file}`));
+        });
+      }
       
       return shFiles;
     } catch (error) {
-      console.error(chalk.red(`Error scanning directory: ${error.message}`));
+      console.error(chalk.red(`❌ Error scanning directory ${scriptsDir}: ${error.message}`));
+      if (error.code === 'EACCES') {
+        console.log(chalk.yellow(`Permission denied. Please check directory permissions.`));
+      } else if (error.code === 'ENOENT') {
+        console.log(chalk.yellow(`Directory not found. Please create ${scriptsDir} manually.`));
+      }
       return [];
     }
   }

@@ -34,7 +34,7 @@ Successfully removed all external dependencies from the `@curl-runner/core` libr
 
 ### **Example Output**
 ```
-[INFO] Found 3 .sh files in ./test-scripts:
+[INFO] Found 3 .sh files in ./cURL_scripts:
   1. test-get.sh
   2. test-post.sh
   3. test-error.sh

@@ -72,11 +72,20 @@ export class CurlRunner {
     
     if (!FileSystem.fileExists(scriptPath)) {
       const errorMsg = `Script ${scriptName} not found in ${this.scriptsDir}`;
-      console.error(chalk.red(errorMsg));
+      console.error(chalk.red(`❌ ${errorMsg}`));
+      console.log(chalk.yellow(`💡 Make sure the script exists and the directory path is correct.`));
       if (logFile) {
         this.writeLog(logFile, `ERROR: ${errorMsg}`);
       }
-      return false;
+      return {
+        scriptName,
+        success: false,
+        error: errorMsg,
+        duration: 0,
+        httpStatus: null,
+        output: '',
+        stderr: ''
+      };
     }
 
     console.log(chalk.cyan(`\n🚀 Running script: ${scriptName}`));
@@ -113,7 +122,15 @@ export class CurlRunner {
           // Write to API error log for execution errors
           this.writeErrorLog(scriptName, error.message, null, duration);
           
-          resolve(false);
+          resolve({
+          scriptName,
+          success: false,
+          error: errorMessage || errorMsg,
+          duration,
+          httpStatus: parsed.httpStatus,
+          output: stdout,
+          stderr: stderr
+        });
           return;
         }
 
@@ -134,7 +151,15 @@ export class CurlRunner {
           // Write to dedicated API error log
           this.writeErrorLog(scriptName, errorMessage || errorMsg, httpStatus, duration);
           
-          resolve(false);
+          resolve({
+          scriptName,
+          success: false,
+          error: errorMessage || errorMsg,
+          duration,
+          httpStatus: parsed.httpStatus,
+          output: stdout,
+          stderr: stderr
+        });
           return;
         }
 
@@ -158,7 +183,14 @@ export class CurlRunner {
           }
         }
         
-        resolve(true);
+        resolve({
+          scriptName,
+          success: true,
+          duration,
+          httpStatus: parsed.httpStatus,
+          output: stdout,
+          stderr: stderr
+        });
       });
     });
   }
@@ -170,8 +202,10 @@ export class CurlRunner {
     const scripts = this.scanScripts();
     
     if (scripts.length === 0) {
-      console.log(chalk.yellow('No .sh files found to run.'));
-      return;
+      console.log(chalk.yellow('⚠️  No .sh files found to run.'));
+      console.log(chalk.gray(`📁 Checked directory: ${this.scriptsDir}`));
+      console.log(chalk.gray(`💡 Add some .sh files to get started!`));
+      return [];
     }
 
     const logFile = this.generateLogFilename();
@@ -246,7 +280,9 @@ export class CurlRunner {
     const scripts = this.scanScripts();
     
     if (scripts.length === 0) {
-      console.log(chalk.yellow('No .sh files found to run.'));
+      console.log(chalk.yellow('⚠️  No .sh files found to run.'));
+      console.log(chalk.gray(`📁 Checked directory: ${this.scriptsDir}`));
+      console.log(chalk.gray(`💡 Add some .sh files to get started!`));
       return [];
     }
 
@@ -295,7 +331,9 @@ export class CurlRunner {
     const scripts = this.scanScripts();
     
     if (scripts.length === 0) {
-      console.log(chalk.yellow('No .sh files found to run.'));
+      console.log(chalk.yellow('⚠️  No .sh files found to run.'));
+      console.log(chalk.gray(`📁 Checked directory: ${this.scriptsDir}`));
+      console.log(chalk.gray(`💡 Add some .sh files to get started!`));
       return [];
     }
 

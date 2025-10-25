@@ -3,7 +3,7 @@
  */
 export const DEFAULT_CONFIG = {
   // Directory paths
-  SCRIPTS_DIR: './scripts',
+  SCRIPTS_DIR: './cURL_scripts',
   LOGS_DIR: './var/logs',
   
   // Log file names
@@ -46,7 +46,7 @@ export const DEFAULT_CONFIG = {
       short: '-d',
       long: '--dir',
       description: 'Scripts directory',
-      default: './scripts'
+      default: './cURL_scripts'
     },
     logs: {
       short: '-l',

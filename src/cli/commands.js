@@ -15,7 +15,7 @@ export function setupCommands() {
   program
     .command('run')
     .description('Run all .sh files in the scripts directory')
-    .option('-d, --dir <directory>', 'Scripts directory', './scripts')
+    .option('-d, --dir <directory>', 'Scripts directory', './cURL_scripts')
     .option('-l, --logs <directory>', 'Logs directory', './var/logs')
     .action(async (options) => {
       const runner = new CurlRunner(options.dir, options.logs);
@@ -25,7 +25,7 @@ export function setupCommands() {
   program
     .command('run-script <script>')
     .description('Run a specific .sh file')
-    .option('-d, --dir <directory>', 'Scripts directory', './scripts')
+    .option('-d, --dir <directory>', 'Scripts directory', './cURL_scripts')
     .option('-l, --logs <directory>', 'Logs directory', './var/logs')
     .action(async (script, options) => {
       const runner = new CurlRunner(options.dir, options.logs);
@@ -35,7 +35,7 @@ export function setupCommands() {
   program
     .command('run-parallel')
     .description('Run all .sh files in parallel (unlimited concurrency)')
-    .option('-d, --dir <directory>', 'Scripts directory', './scripts')
+    .option('-d, --dir <directory>', 'Scripts directory', './cURL_scripts')
     .option('-l, --logs <directory>', 'Logs directory', './var/logs')
     .action(async (options) => {
       const runner = new CurlRunner(options.dir, options.logs);
@@ -45,7 +45,7 @@ export function setupCommands() {
   program
     .command('run-concurrent')
     .description('Run all .sh files with controlled concurrency (batched parallel execution)')
-    .option('-d, --dir <directory>', 'Scripts directory', './scripts')
+    .option('-d, --dir <directory>', 'Scripts directory', './cURL_scripts')
     .option('-l, --logs <directory>', 'Logs directory', './var/logs')
     .option('-b, --batch-size <size>', 'Batch size for concurrent execution', '5')
     .option('--delay <ms>', 'Delay between batches in milliseconds', '200')
@@ -61,7 +61,7 @@ export function setupCommands() {
   program
     .command('run-concurrency <max>')
     .description('Run all .sh files with custom concurrency control')
-    .option('-d, --dir <directory>', 'Scripts directory', './scripts')
+    .option('-d, --dir <directory>', 'Scripts directory', './cURL_scripts')
     .option('-l, --logs <directory>', 'Logs directory', './var/logs')
     .action(async (maxConcurrent, options) => {
       const runner = new CurlRunner(options.dir, options.logs);
@@ -72,7 +72,7 @@ export function setupCommands() {
   program
     .command('list')
     .description('List all available .sh files')
-    .option('-d, --dir <directory>', 'Scripts directory', './scripts')
+    .option('-d, --dir <directory>', 'Scripts directory', './cURL_scripts')
     .option('-l, --logs <directory>', 'Logs directory', './var/logs')
     .action((options) => {
       const runner = new CurlRunner(options.dir, options.logs);
