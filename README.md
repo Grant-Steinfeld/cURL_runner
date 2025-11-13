@@ -136,52 +136,52 @@ npm run test:ci
 
 ### Run All Scripts
 
-#### Sequential Execution (Original)
-Execute all `.sh` files in the cURL_scripts directory sequentially:
+#### Sequential Execution
+Execute every `.sh` file sequentially (also used by `npm start` and `npm run dev`):
 ```bash
-npm start
-# or
-node index.js
-# or
-node index.js run
+bash scripts/run_all.sh
 ```
 
-#### Parallel Execution (New - 86.3% Faster!)
-Execute all `.sh` files in the cURL_scripts directory in parallel for maximum speed:
+Optionally pass custom directories:
 ```bash
-node index.js run-parallel
+bash scripts/run_all.sh ./my-scripts ./my-logs
 ```
 
-#### Controlled Concurrency (New)
-Execute scripts in batches with configurable limits:
+#### Parallel Execution (86.3% Faster)
+Run all scripts with unlimited parallelism:
 ```bash
-# Run in batches of 3 with 200ms delay between batches
-node index.js run-concurrent --batch-size 3 --delay 200
+bash scripts/run_parallel.sh
+```
 
-# Run with custom concurrency limit
-node index.js run-concurrency 5
+#### Controlled Concurrency
+Run scripts in batches with optional delay:
+```bash
+# Arguments: [scripts-dir] [logs-dir] [batch-size] [delay-ms]
+bash scripts/run_concurrent.sh ./cURL_scripts ./var/logs 3 200
 ```
 
 ### Run Specific Script
-Execute a specific `.sh` file:
+Execute a specific `.sh` file by name (with or without `.sh` suffix):
 ```bash
-node index.js run-script example-get
+bash scripts/run_script.sh example-get
 # or
-node index.js run-script example-get.sh
+bash scripts/run_script.sh example-get.sh ./cURL_scripts ./var/logs
 ```
 
 ### List Available Scripts
-Show all available `.sh` files:
+Show the discoverable `.sh` files:
 ```bash
-node index.js list
+bash scripts/list_scripts.sh
 ```
 
-### Custom Directories
-Specify different directories for scripts and logs:
+### Custom Directories via Environment
+Instead of passing arguments you can export environment variables before invoking the shell helpers:
 ```bash
-node index.js run -d ./my-scripts -l ./my-logs
-node index.js run-script my-script -d ./my-scripts -l ./my-logs
-node index.js list -d ./my-scripts -l ./my-logs
+export CURL_RUNNER_SCRIPTS_DIR=./my-scripts
+export CURL_RUNNER_LOGS_DIR=./my-logs
+export CURL_RUNNER_BATCH_SIZE=5      # optional, used by run_concurrent.sh
+export CURL_RUNNER_DELAY=250         # optional, used by run_concurrent.sh
+bash scripts/run_all.sh
 ```
 
 ## Performance Comparison
@@ -291,15 +291,22 @@ cURL_runner/
 │   ├── SEPARATION_OF_CONCERNS.md
 │   ├── TEST_MOCKING_UPDATE.md
 │   └── HowJestNeededToBeConfiguredForESModules.md
-├── src/              # Source code (separation of concerns)
-│   ├── cli/          # CLI handling
+├── src/              # Source code (ES modules)
 │   ├── config/       # Configuration
 │   ├── lib/          # Core business logic
 │   └── utils/        # Utility classes
-├── scripts/          # Directory for .sh files
-│   ├── example-get.sh
-│   ├── example-post.sh
-│   └── example-headers.sh
+├── scripts/          # Shell helpers & lightweight Node entrypoints
+│   ├── list-scripts.mjs
+│   ├── list_scripts.sh
+│   ├── run-all.mjs
+│   ├── run-concurrent.mjs
+│   ├── run-parallel.mjs
+│   ├── run-script.mjs
+│   ├── run_all.sh
+│   ├── run_concurrent.sh
+│   ├── run_parallel.sh
+│   └── run_script.sh
+├── cURL_scripts/     # Example cURL `.sh` files executed by the runner
 ├── tests/            # Testing framework
 │   ├── unit/         # Unit tests
 │   ├── integration/  # Integration tests
