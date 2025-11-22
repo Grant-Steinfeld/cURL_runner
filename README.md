@@ -133,93 +133,19 @@ Logs are automatically created in the `var/logs` directory:
 - **Report log**: `curl-runner-report.log` (high-level summary)
 - **Error log**: `curl-api-errors.log` (HTTP 4xx/5xx errors)
 
-## Git Commit Tracking
+## How It Works
 
-The project includes a background daemon that automatically tracks git commits and generates dynamic reports.
+The application scans a directory for `.sh` files containing cURL commands and executes them based on the selected mode.
 
-### Start Git Tracker
+**Sequential Execution**: Scripts run one at a time, waiting for each to complete before starting the next. This is the safest mode and ensures predictable execution order. Each script's output is logged, and results are collected into an array.
 
-Start the background daemon to track commits:
+**Parallel Execution**: All scripts start simultaneously using JavaScript's Promise.all. While one script waits for network I/O, others can execute. This maximizes speed but uses more system resources. All scripts complete independently, and results are collected when all finish.
 
-```bash
-bash scripts/start-git-tracker.sh
-# or via npm
-npm run git:tracker:start
-```
+**Concurrent Execution**: Scripts run in controlled batches. A specified number of scripts execute simultaneously, then the system waits for that batch to complete before starting the next batch. A configurable delay can be added between batches to manage resource usage. This provides a balance between speed and system load.
 
-The tracker runs in the background and:
-- Monitors git commits every minute (configurable)
-- Automatically generates summary and daily reports
-- Stores commit data in `var/git-tracker/`
-- Generates reports in `var/git-reports/`
+**Error Handling**: When a script executes, the system captures both stdout and stderr. HTTP status codes are extracted from the output. If a status code indicates an error (4xx or 5xx), it's logged to a dedicated error log. Execution errors are also captured and logged. All results include success status, duration, HTTP status, and any error messages.
 
-### Stop Git Tracker
-
-Stop the background daemon:
-
-```bash
-bash scripts/stop-git-tracker.sh
-# or via npm
-npm run git:tracker:stop
-```
-
-### Check Status
-
-Check if the tracker is running and view statistics:
-
-```bash
-bash scripts/git-tracker-status.sh
-# or via npm
-npm run git:tracker:status
-```
-
-### View Reports
-
-View generated reports:
-
-```bash
-# View summary report
-node scripts/view-git-report.mjs summary
-
-# View today's daily report
-node scripts/view-git-report.mjs daily
-
-# View specific day's report
-node scripts/view-git-report.mjs daily 2024-01-15
-```
-
-### Report Features
-
-The git tracker generates comprehensive reports including:
-
-- **Summary Report** (`summary-report.json`):
-  - Total commits tracked
-  - Commits in last 24 hours, 7 days, 30 days
-  - Code change statistics (files, insertions, deletions)
-  - Top contributors
-  - Recent commits
-  - Time-based statistics (hourly, daily, monthly patterns)
-
-- **Daily Reports** (`daily-report-YYYY-MM-DD.json`):
-  - Commits for specific day
-  - Files changed per commit
-  - Author information
-  - Change statistics
-
-### Configuration
-
-Set environment variables to customize behavior:
-
-```bash
-# Check interval in milliseconds (default: 60000 = 1 minute)
-export GIT_TRACKER_INTERVAL=30000
-
-# Custom reports directory
-export GIT_REPORTS_DIR=./custom-reports
-
-# Custom data directory
-export GIT_TRACKER_DATA_DIR=./custom-data
-```
+**Logging System**: Each execution creates timestamped log files. A high-level report log tracks all executions with summaries. Errors are written to a dedicated error log for easy review. The logging system automatically creates directories if they don't exist.
 
 ## Requirements
 
