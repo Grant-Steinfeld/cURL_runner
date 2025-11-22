@@ -20,7 +20,7 @@
     "author": "",
     "license": "MIT",
     "dependencies": {
-        "curl-runner-core": "beta"
+        "curl-runner-core": "^1.2.0"
     },
     "engines": {
         "node": ">=18.0.0"

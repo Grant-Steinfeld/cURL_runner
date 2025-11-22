@@ -6,7 +6,7 @@
  * This demonstrates how to use curl-runner-core in a Node.js application.
  */
 
-import { createRunner, runAllScripts, listScripts } from 'curl-runner-core';
+import { createRunner, runAllScripts, listScripts } from '../index.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
