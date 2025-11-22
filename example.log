@@ -1,0 +1,99 @@
+# Example Log Output from cURL Runner
+# This file demonstrates the log format and structure produced by the cURL Runner
+
+# ============================================================================
+# Batch Execution Log (run_YYYY-MM-DDTHH-MM-SS.log)
+# ============================================================================
+[2024-01-15T10:30:45.123Z] Starting batch execution of 3 scripts
+[2024-01-15T10:30:45.124Z] Scripts to run: example-get.sh, example-post.sh, example-headers.sh
+[2024-01-15T10:30:45.125Z] Starting execution of script: example-get.sh
+[2024-01-15T10:30:46.234Z] SUCCESS: example-get.sh completed successfully in 1109ms
+[2024-01-15T10:30:46.235Z] OUTPUT: {"args":{},"headers":{"Accept":"application/json","User-Agent":"curl-runner/1.0"},"url":"https://httpbin.org/get"}
+[2024-01-15T10:30:46.236Z] Starting execution of script: example-post.sh
+[2024-01-15T10:30:47.090Z] SUCCESS: example-post.sh completed successfully in 854ms
+[2024-01-15T10:30:47.091Z] OUTPUT: {"json":{"message":"test data"},"url":"https://httpbin.org/post"}
+[2024-01-15T10:30:47.092Z] Starting execution of script: example-headers.sh
+[2024-01-15T10:30:47.326Z] API ERROR: example-headers.sh: HTTP 404 error
+[2024-01-15T10:30:47.327Z] ERROR: API Error: HTTP 404
+[2024-01-15T10:30:47.328Z] Batch execution completed: 2 successful, 1 failed, 3 total
+
+# ============================================================================
+# Individual Script Log (script-name_YYYY-MM-DDTHH-MM-SS.log)
+# ============================================================================
+[2024-01-15T10:35:12.456Z] Starting execution of script: example-get.sh
+[2024-01-15T10:35:13.567Z] SUCCESS: example-get.sh completed successfully in 1111ms
+[2024-01-15T10:35:13.568Z] OUTPUT: {"args":{},"headers":{"Accept":"application/json"},"url":"https://httpbin.org/get"}
+
+# ============================================================================
+# Report Log (curl-runner-report.log) - High-level summary
+# ============================================================================
+[2024-01-15T10:30:45.123Z] 🚀 BATCH START: Running 3 scripts
+[2024-01-15T10:30:46.234Z] ✅ SUCCESS: example-get.sh (1109ms)
+[2024-01-15T10:30:47.090Z] ✅ SUCCESS: example-post.sh (854ms)
+[2024-01-15T10:30:47.326Z] ❌ API ERROR: example-headers.sh (234ms) - HTTP 404
+[2024-01-15T10:30:47.328Z] 🏁 BATCH COMPLETE: 2/3 successful (1 failed)
+
+# ============================================================================
+# API Error Log (curl-api-errors.log) - Dedicated error tracking
+# ============================================================================
+[2024-01-15T10:30:47.326Z] ❌ API ERROR: example-headers.sh (234ms)
+[2024-01-15T10:30:47.326Z] HTTP Status: 404
+[2024-01-15T10:30:47.326Z] Error: HTTP 404 error
+[2024-01-15T10:30:47.326Z] ─────────────────────────────────────────
+
+# ============================================================================
+# Execution Error Log (curl-api-errors.log) - Script execution failures
+# ============================================================================
+[2024-01-15T10:40:15.789Z] ❌ API ERROR: test-script.sh (0ms)
+[2024-01-15T10:40:15.789Z] Error: Command failed: bash "scripts/test-script.sh"
+[2024-01-15T10:40:15.789Z] curl: (6) Could not resolve host: example.com
+[2024-01-15T10:40:15.789Z] ─────────────────────────────────────────
+
+# ============================================================================
+# Parallel Execution Log Example
+# ============================================================================
+[2024-01-15T11:00:00.000Z] Starting parallel execution of 5 scripts
+[2024-01-15T11:00:00.001Z] Scripts to run: script1.sh, script2.sh, script3.sh, script4.sh, script5.sh
+[2024-01-15T11:00:01.234Z] SUCCESS: script1.sh completed successfully in 1233ms
+[2024-01-15T11:00:01.456Z] SUCCESS: script2.sh completed successfully in 1455ms
+[2024-01-15T11:00:01.678Z] SUCCESS: script3.sh completed successfully in 1677ms
+[2024-01-15T11:00:01.890Z] API ERROR: script4.sh: HTTP 500 error
+[2024-01-15T11:00:02.012Z] SUCCESS: script5.sh completed successfully in 2011ms
+[2024-01-15T11:00:02.013Z] Parallel execution completed: 4 successful, 1 failed, 5 total in 2013ms
+
+# ============================================================================
+# Concurrent Execution Log Example (Batched)
+# ============================================================================
+[2024-01-15T12:00:00.000Z] Starting concurrent execution of 10 scripts in batches of 3
+[2024-01-15T12:00:00.001Z] Scripts to run: script1.sh, script2.sh, script3.sh, script4.sh, script5.sh, script6.sh, script7.sh, script8.sh, script9.sh, script10.sh
+[2024-01-15T12:00:00.002Z] Starting batch 1/4 with scripts: script1.sh, script2.sh, script3.sh
+[2024-01-15T12:00:01.100Z] SUCCESS: script1.sh completed successfully in 1098ms
+[2024-01-15T12:00:01.200Z] SUCCESS: script2.sh completed successfully in 1198ms
+[2024-01-15T12:00:01.300Z] SUCCESS: script3.sh completed successfully in 1298ms
+[2024-01-15T12:00:01.301Z] Batch 1 completed: 3 successful, 0 failed in 1299ms
+[2024-01-15T12:00:01.501Z] Starting batch 2/4 with scripts: script4.sh, script5.sh, script6.sh
+[2024-01-15T12:00:02.600Z] SUCCESS: script4.sh completed successfully in 1099ms
+[2024-01-15T12:00:02.700Z] SUCCESS: script5.sh completed successfully in 1199ms
+[2024-01-15T12:00:02.800Z] API ERROR: script6.sh: HTTP 403 error
+[2024-01-15T12:00:02.801Z] Batch 2 completed: 2 successful, 1 failed in 1300ms
+[2024-01-15T12:00:03.001Z] Starting batch 3/4 with scripts: script7.sh, script8.sh, script9.sh
+[2024-01-15T12:00:04.100Z] SUCCESS: script7.sh completed successfully in 1099ms
+[2024-01-15T12:00:04.200Z] SUCCESS: script8.sh completed successfully in 1199ms
+[2024-01-15T12:00:04.300Z] SUCCESS: script9.sh completed successfully in 1299ms
+[2024-01-15T12:00:04.301Z] Batch 3 completed: 3 successful, 0 failed in 1300ms
+[2024-01-15T12:00:04.501Z] Starting batch 4/4 with scripts: script10.sh
+[2024-01-15T12:00:05.600Z] SUCCESS: script10.sh completed successfully in 1099ms
+[2024-01-15T12:00:05.601Z] Batch 4 completed: 1 successful, 0 failed in 1100ms
+[2024-01-15T12:00:05.602Z] Concurrent execution completed: 9 successful, 1 failed, 10 total in 5602ms
+
+# ============================================================================
+# Notes:
+# - All timestamps are in ISO 8601 format (UTC)
+# - Log entries are prefixed with [timestamp]
+# - Success entries include duration in milliseconds
+# - API errors include HTTP status codes
+# - Execution errors include error messages from curl or bash
+# - Report log provides high-level summary suitable for tailing
+# - Error log focuses on HTTP 4xx/5xx errors and execution failures
+# ============================================================================
+
