@@ -34,6 +34,24 @@ bash scripts/run_script.sh example-get.sh
 bash scripts/list_scripts.sh
 ```
 
+### Run with Full Output Logging
+Run the processor and capture all stdout/stderr to a timestamped log file (output also shown on screen):
+```bash
+bash scripts/run_with_log.sh
+# or via npm
+npm run run:log
+```
+
+### Run with Background Logging
+Run the processor and log only to file (no screen output, shows last 20 lines on error):
+```bash
+bash scripts/run_with_log_background.sh
+# or via npm
+npm run run:log:background
+```
+
+Log files are saved as: `var/logs/curl-runner-stdout_YYYY-MM-DDTHH-MM-SS.log`
+
 ## Programmatic Usage
 
 ```javascript

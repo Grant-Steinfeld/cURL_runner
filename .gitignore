@@ -91,9 +91,11 @@ logs/
 var/logs/
 *.log.*
 
-# Scripts directory (user's cURL scripts)
-scripts/
+# User's cURL scripts (but allow runner scripts in scripts/)
+cURL_scripts/
 *.sh
+!scripts/*.sh
+!scripts/*.mjs
 
 # OS generated files
 .DS_Store
