@@ -133,6 +133,94 @@ Logs are automatically created in the `var/logs` directory:
 - **Report log**: `curl-runner-report.log` (high-level summary)
 - **Error log**: `curl-api-errors.log` (HTTP 4xx/5xx errors)
 
+## Git Commit Tracking
+
+The project includes a background daemon that automatically tracks git commits and generates dynamic reports.
+
+### Start Git Tracker
+
+Start the background daemon to track commits:
+
+```bash
+bash scripts/start-git-tracker.sh
+# or via npm
+npm run git:tracker:start
+```
+
+The tracker runs in the background and:
+- Monitors git commits every minute (configurable)
+- Automatically generates summary and daily reports
+- Stores commit data in `var/git-tracker/`
+- Generates reports in `var/git-reports/`
+
+### Stop Git Tracker
+
+Stop the background daemon:
+
+```bash
+bash scripts/stop-git-tracker.sh
+# or via npm
+npm run git:tracker:stop
+```
+
+### Check Status
+
+Check if the tracker is running and view statistics:
+
+```bash
+bash scripts/git-tracker-status.sh
+# or via npm
+npm run git:tracker:status
+```
+
+### View Reports
+
+View generated reports:
+
+```bash
+# View summary report
+node scripts/view-git-report.mjs summary
+
+# View today's daily report
+node scripts/view-git-report.mjs daily
+
+# View specific day's report
+node scripts/view-git-report.mjs daily 2024-01-15
+```
+
+### Report Features
+
+The git tracker generates comprehensive reports including:
+
+- **Summary Report** (`summary-report.json`):
+  - Total commits tracked
+  - Commits in last 24 hours, 7 days, 30 days
+  - Code change statistics (files, insertions, deletions)
+  - Top contributors
+  - Recent commits
+  - Time-based statistics (hourly, daily, monthly patterns)
+
+- **Daily Reports** (`daily-report-YYYY-MM-DD.json`):
+  - Commits for specific day
+  - Files changed per commit
+  - Author information
+  - Change statistics
+
+### Configuration
+
+Set environment variables to customize behavior:
+
+```bash
+# Check interval in milliseconds (default: 60000 = 1 minute)
+export GIT_TRACKER_INTERVAL=30000
+
+# Custom reports directory
+export GIT_REPORTS_DIR=./custom-reports
+
+# Custom data directory
+export GIT_TRACKER_DATA_DIR=./custom-data
+```
+
 ## Requirements
 
 - Node.js 18.0.0 or higher
