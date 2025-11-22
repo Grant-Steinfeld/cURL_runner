@@ -9,7 +9,7 @@
     "src/",
     "scripts/",
     "README.md",
-    "README.JS_ConcurrencyConcepts.md"
+    "example.log"
   ],
   "scripts": {
     "start": "bash scripts/run_all.sh",
